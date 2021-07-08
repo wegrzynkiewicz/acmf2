@@ -1,0 +1,10 @@
+{
+  "cSpell.words": [
+    "Deno"
+  ],
+  "deno.enable": true,
+  "editor.defaultFormatter": "denoland.vscode-deno",
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
+}
