@@ -1,5 +1,5 @@
 import type { ConsoleArgument } from "../define/ConsoleArgument.ts";
-import type { ConsoleCommand } from "../define/ConsoleCommand.ts";
+import type { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
 import type { ConsoleOption } from "../define/ConsoleOption.ts";
 import type { ConsoleOptionParameter } from "../define/ConsoleOptionParameter.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
@@ -23,15 +23,13 @@ export class UsagePrinter {
     this.output = output;
   }
 
-  public writeHelp(command: ConsoleCommand): void {
+  public writeHelp(command: AnyConsoleCommand): void {
     this.writeCommandUsage(command);
     this.writeCommandDescription(command);
     this.writeCommandAliases(command);
-
     const argumentInfo = this.getCommandArguments(command);
     const optionsInfo = this.getCommandOptions(command);
     const commandsInfo = this.getSubCommands(command);
-
     let maxLength = 0;
     for (const infos of [argumentInfo, optionsInfo, commandsInfo]) {
       for (const { header } of infos) {
@@ -62,9 +60,8 @@ export class UsagePrinter {
     }
   }
 
-  public writeCommandUsage(command: ConsoleCommand): void {
+  public writeCommandUsage(command: AnyConsoleCommand): void {
     const { args, hidden, name, options } = command;
-
     this.output.write("Usage:");
     this.output.write(` ${this.executableName}`);
     if (name !== "" && !hidden) {
@@ -83,7 +80,7 @@ export class UsagePrinter {
     this.output.writeLine("");
   }
 
-  public writeCommandDescription(command: ConsoleCommand): void {
+  public writeCommandDescription(command: AnyConsoleCommand): void {
     const { description } = command;
     if (description) {
       this.output.writeLine(description);
@@ -91,7 +88,7 @@ export class UsagePrinter {
     }
   }
 
-  public writeCommandAliases(command: ConsoleCommand): void {
+  public writeCommandAliases(command: AnyConsoleCommand): void {
     const { aliases } = command;
     if (aliases.size > 0) {
       this.output.writeLine("Aliases:");
@@ -114,7 +111,7 @@ export class UsagePrinter {
     return label;
   }
 
-  public getCommandArguments(command: ConsoleCommand): UsageInfo[] {
+  public getCommandArguments(command: AnyConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
     for (const argument of command.args.values()) {
       const argumentData: UsageInfo = {
@@ -126,7 +123,7 @@ export class UsagePrinter {
     return table;
   }
 
-  public getCommandOptions(command: ConsoleCommand): UsageInfo[] {
+  public getCommandOptions(command: AnyConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
     for (const option of command.options.values()) {
       const optionRow: UsageInfo = {
@@ -140,7 +137,6 @@ export class UsagePrinter {
 
   public getCommandOptionLabel(option: ConsoleOption): string {
     const { longFlags, parameter, shortFlags } = option;
-
     const flags: string[] = [];
     if (shortFlags.length > 0) {
       for (const shortFlag of shortFlags) {
@@ -152,13 +148,11 @@ export class UsagePrinter {
         flags.push(`--${longFlag}`);
       }
     }
-
     let label = flags.join(", ");
     if (parameter) {
       label += "=";
       label += this.getCommandOptionParameterLabel(parameter);
     }
-
     return label;
   }
 
@@ -174,7 +168,7 @@ export class UsagePrinter {
     return label;
   }
 
-  public getSubCommands(command: ConsoleCommand): UsageInfo[] {
+  public getSubCommands(command: AnyConsoleCommand): UsageInfo[] {
     const list: UsageInfo[] = [];
     for (const child of command.commands.values()) {
       if (!child.hidden) {
@@ -184,7 +178,7 @@ export class UsagePrinter {
     return list;
   }
 
-  public getAvailableCommandDescription(command: ConsoleCommand): UsageInfo {
+  public getAvailableCommandDescription(command: AnyConsoleCommand): UsageInfo {
     const { name, description } = command;
     let header = `  ${name}`;
     const usageTable: UsageInfo = {

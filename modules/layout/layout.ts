@@ -9,7 +9,7 @@ export type LayoutTypeName =
   | "array"
   | "null";
 
-interface LayoutBase extends JSONSchema7 {
+export interface LayoutBase extends JSONSchema7 {
   description?: string;
   title?: string;
   type: LayoutTypeName;
@@ -29,21 +29,21 @@ type LayoutObjectProperties<T> = {
 interface LayoutArray<T> extends LayoutBase {
   type: "array";
   items: T extends number ? LayoutNumber
-  : T extends string ? LayoutString
-  : LayoutObject<T>;
+    : T extends string ? LayoutString
+    : LayoutObject<T>;
 }
 
-interface LayoutObject<T> extends LayoutBase {
+export interface LayoutObject<T> extends LayoutBase {
   properties: LayoutObjectProperties<T>;
   required: string[];
 }
 
-interface LayoutNumber extends LayoutBase {
+export interface LayoutNumber extends LayoutBase {
   default?: number;
   type: "number";
 }
 
-interface LayoutString extends LayoutBase {
+export interface LayoutString extends LayoutBase {
   default?: string;
   type: "string";
 }

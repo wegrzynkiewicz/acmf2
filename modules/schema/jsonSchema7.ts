@@ -18,9 +18,9 @@ export type JSONSchema7TypeName =
   | "null";
 
 /**
-* Primitive type
-* @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1.1
-*/
+ * Primitive type
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1.1
+ */
 export type JSONSchema7Type =
   | string //
   | number
@@ -39,22 +39,22 @@ export interface JSONSchema7Object {
 export interface JSONSchema7Array extends Array<JSONSchema7Type> {}
 
 /**
-* Meta schema
-*
-* Recommended values:
-* - 'http://json-schema.org/schema#'
-* - 'http://json-schema.org/hyper-schema#'
-* - 'http://json-schema.org/draft-07/schema#'
-* - 'http://json-schema.org/draft-07/hyper-schema#'
-*
-* @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-5
-*/
+ * Meta schema
+ *
+ * Recommended values:
+ * - 'http://json-schema.org/schema#'
+ * - 'http://json-schema.org/hyper-schema#'
+ * - 'http://json-schema.org/draft-07/schema#'
+ * - 'http://json-schema.org/draft-07/hyper-schema#'
+ *
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-5
+ */
 export type JSONSchema7Version = string;
 
 /**
-* JSON Schema v7
-* @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01
-*/
+ * JSON Schema v7
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01
+ */
 export type JSONSchema7Definition = JSONSchema7 | boolean;
 export interface JSONSchema7 {
   $id?: string;

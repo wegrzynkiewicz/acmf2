@@ -33,8 +33,8 @@ if (typeof Deno === "object") {
 }
 
 debug({
-  kind: 'debugger-info',
-  message: 'Debugger enabled.'
+  kind: "debugger-info",
+  message: "Debugger enabled.",
 });
 
 export { debug };

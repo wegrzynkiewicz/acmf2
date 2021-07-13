@@ -1,24 +1,28 @@
+export type ConsoleArgumentType = "array" | "boolean" | "number" | "string";
+
 export class ConsoleArgument {
-  public readonly defaults?: unknown;
   public readonly description: string;
+  public readonly defaults: unknown;
   public readonly name: string;
   public readonly required: boolean;
   public readonly rest: boolean;
+  public readonly type: ConsoleArgumentType;
 
   public constructor(
-    { defaults, description, name, rest, required }: {
-      defaults?: unknown;
+    { defaults, description, name, required, type }: {
+      defaults: unknown;
       description?: string;
       name: string;
-      rest?: boolean;
       required?: boolean;
+      type: ConsoleArgumentType;
     },
   ) {
-    this.defaults = defaults;
     this.description = description ?? "";
+    this.defaults = defaults;
     this.name = name;
     this.required = required ?? false;
-    this.rest = rest ?? false;
+    this.rest = type === "array";
+    this.type = type;
   }
 
   public assert(value: unknown): void {

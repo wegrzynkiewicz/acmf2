@@ -4,7 +4,14 @@ import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { Table } from "../../runtime/Table.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import { HelpOption } from "../HelpOption.ts";
+import {
+  HelpCommandOptionsInput,
+  helpCommandOptionsInputLayout,
+} from "../help/HelpCommandOptionsInput.ts";
+import {
+  NullCommandArgumentsInput,
+  nullCommandArgumentsInputLayout,
+} from "../null/NullCommandArgumentsInput.ts";
 
 export interface ConfigEntryRow {
   comment: string;
@@ -13,15 +20,14 @@ export interface ConfigEntryRow {
   value: string;
 }
 
-export class ListConfigEntriesCommand extends ConsoleCommand {
+export class ListConfigEntriesCommand
+  extends ConsoleCommand<NullCommandArgumentsInput, HelpCommandOptionsInput> {
   public constructor() {
     super({
-      args: [],
+      argumentsLayout: nullCommandArgumentsInputLayout,
       description: "Display all registered config entries.",
       name: "list",
-      options: [
-        new HelpOption(),
-      ],
+      optionsLayout: helpCommandOptionsInputLayout,
     });
   }
 

@@ -1,51 +1,108 @@
 import { debug } from "../../debugger/debug.ts";
 import { ExecutableHandler } from "../../context/Executable.ts";
+import { Context } from "../../context/Context.ts";
+import {
+  LayoutCommandArgument,
+  LayoutCommandArguments,
+} from "../layout/layoutArguments.ts";
+import {
+  LayoutCommandOption,
+  LayoutCommandOptions,
+} from "../layout/layoutOptions.ts";
 import { ConsoleArgument } from "./ConsoleArgument.ts";
 import { ConsoleOption } from "./ConsoleOption.ts";
-import { Context } from "../../context/Context.ts";
+import { ConsoleOptionParameter } from "./ConsoleOptionParameter.ts";
 
-export class ConsoleCommand implements ExecutableHandler {
+export type AnyConsoleCommand = ConsoleCommand<
+  any | undefined,
+  any | undefined
+>;
+
+export class ConsoleCommand<
+  ArgumentsType extends object,
+  OptionsType extends object,
+> implements ExecutableHandler {
   public readonly aliases = new Set<string>();
   public readonly args = new Map<string, ConsoleArgument>();
-  public readonly commands = new Map<string, ConsoleCommand>();
+  public readonly argumentsLayout: LayoutCommandArguments<ArgumentsType>;
+  public readonly commands = new Map<string, ConsoleCommand<any, any>>();
   public readonly description: string;
   public readonly hidden: boolean;
   public readonly name: string;
   public readonly options = new Map<string, ConsoleOption>();
+  public readonly optionsLayout: LayoutCommandOptions<Required<OptionsType>>;
 
   public constructor(
-    { aliases, args, commands, description, name, hidden, options }: {
+    { aliases, argumentsLayout, description, name, hidden, optionsLayout }: {
       aliases?: string[];
-      args?: ConsoleArgument[];
-      commands?: ConsoleCommand[];
+      argumentsLayout: LayoutCommandArguments<ArgumentsType>;
       description?: string;
       name: string;
       hidden?: boolean;
-      options?: ConsoleOption[];
+      optionsLayout: LayoutCommandOptions<OptionsType>;
     },
   ) {
     this.description = description ?? "";
     this.hidden = hidden ?? false;
     this.name = name;
+    this.argumentsLayout = argumentsLayout;
+    this.optionsLayout = optionsLayout;
 
     for (const alias of aliases ?? []) {
       this.aliases.add(alias);
     }
 
-    for (const argument of args ?? []) {
-      this.args.set(argument.name, argument);
+    if (argumentsLayout !== undefined) {
+      const args = Object.entries(argumentsLayout.properties);
+      for (const [name, layout] of args) {
+        const { default: defaults, description, type } =
+          layout as LayoutCommandArgument;
+        const argument = new ConsoleArgument({
+          defaults,
+          description,
+          name,
+          required: argumentsLayout.required.includes(name),
+          type,
+        });
+        this.args.set(name, argument);
+      }
     }
 
-    for (const command of commands ?? []) {
-      this.registerCommand(command);
-    }
-
-    for (const option of options ?? []) {
-      this.options.set(option.name, option);
+    if (optionsLayout !== undefined) {
+      const options = Object.entries(optionsLayout.properties);
+      for (const [name, layout] of options) {
+        const propertyLayout = layout as LayoutCommandOption;
+        const {
+          description,
+          default: defaults,
+          longFlags,
+          shortFlags,
+          type,
+        } = propertyLayout;
+        let parameter: ConsoleOptionParameter | undefined = undefined;
+        if (propertyLayout.type !== "boolean") {
+          const { parameterRequired } = propertyLayout;
+          parameter = new ConsoleOptionParameter({
+            name,
+            defaults,
+            required: parameterRequired === true,
+          });
+        }
+        const option = new ConsoleOption({
+          description,
+          longFlags,
+          name,
+          parameter,
+          required: optionsLayout.required.includes(name),
+          shortFlags,
+          type,
+        });
+        this.options.set(name, option);
+      }
     }
   }
 
-  public registerCommand(command: ConsoleCommand): void {
+  public registerCommand(command: AnyConsoleCommand): void {
     const { name } = command;
     debug({
       kind: "console-command-registering",
@@ -55,7 +112,7 @@ export class ConsoleCommand implements ExecutableHandler {
     this.commands.set(name, command);
   }
 
-  public getCommandByName(commandName: string): ConsoleCommand {
+  public getCommandByName(commandName: string): AnyConsoleCommand {
     for (const command of this.commands.values()) {
       if (command.name === commandName) {
         return command;

@@ -1,18 +1,25 @@
-import { ConsoleCommand } from "../define/ConsoleCommand.ts";
-import { ConsoleOutput } from "../define/ConsoleOutput.ts";
-import { ConsoleVersionProvider } from "../runtime/ConsoleVersionProvider.ts";
-import { UsagePrinter } from "../runtime/UsagePrinter.ts";
-import { HelpOption } from "./HelpOption.ts";
+import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
+import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
+import { ConsoleVersionProvider } from "./ConsoleVersionProvider.ts";
+import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
+import {
+  HelpCommandOptionsInput,
+  helpCommandOptionsInputLayout,
+} from "../help/HelpCommandOptionsInput.ts";
+import {
+  NullCommandArgumentsInput,
+  nullCommandArgumentsInputLayout,
+} from "../null/NullCommandArgumentsInput.ts";
 
-export class VersionCommand extends ConsoleCommand {
+export class VersionCommand
+  extends ConsoleCommand<NullCommandArgumentsInput, HelpCommandOptionsInput> {
   public constructor() {
     super({
+      argumentsLayout: nullCommandArgumentsInputLayout,
       aliases: ["show-version"],
       description: "Show the current version of console application.",
       name: "version",
-      options: [
-        new HelpOption(),
-      ],
+      optionsLayout: helpCommandOptionsInputLayout,
     });
   }
 
@@ -22,11 +29,11 @@ export class VersionCommand extends ConsoleCommand {
     },
     { executableName, options, output }: {
       executableName: string;
-      options: Map<string, unknown>;
+      options: HelpCommandOptionsInput;
       output: ConsoleOutput;
     },
   ): Promise<number> {
-    if (options.get("help") === true) {
+    if (options.help === true) {
       const usagePrinter = new UsagePrinter({ executableName, output });
       usagePrinter.writeHelp(this);
       return 0;

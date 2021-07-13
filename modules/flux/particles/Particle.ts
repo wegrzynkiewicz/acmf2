@@ -1,5 +1,8 @@
 import { ConfigRegistry } from "../../config/ConfigRegistry.ts";
-import { ConsoleCommand } from "../../console/define/ConsoleCommand.ts";
+import {
+  AnyConsoleCommand,
+  ConsoleCommand,
+} from "../../console/define/ConsoleCommand.ts";
 import { Context } from "../../context/Context.ts";
 import { ServiceRegistry } from "../../context/ServiceRegistry.ts";
 
@@ -20,7 +23,7 @@ export interface Particle {
 
   initCommands?: (
     globalContext: {
-      commander: ConsoleCommand;
+      commander: AnyConsoleCommand;
     },
   ) => Promise<void>;
 

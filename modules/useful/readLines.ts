@@ -14,7 +14,7 @@ export async function* readLines(file: Deno.File) {
     while (true) {
       const indexOfNextLine = portionText.indexOf("\n");
       if (indexOfNextLine === -1) {
-        textBuffer += portionText
+        textBuffer += portionText;
         break;
       }
       const lastPortionText = portionText.slice(0, indexOfNextLine);
@@ -24,7 +24,7 @@ export async function* readLines(file: Deno.File) {
       textBuffer = "";
     }
   }
-  if (textBuffer !== '') {
+  if (textBuffer !== "") {
     yield textBuffer;
   }
 }

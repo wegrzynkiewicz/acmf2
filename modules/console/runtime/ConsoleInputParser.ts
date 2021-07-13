@@ -1,7 +1,7 @@
 import { ArgParsingOptions, parse } from "../../deps.ts";
-import { ConsoleCommand } from "../define/ConsoleCommand.ts";
+import { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
 
-function getBooleanOptions(command: ConsoleCommand): string[] {
+function getBooleanOptions(command: AnyConsoleCommand): string[] {
   const options: string[] = [];
   for (const option of command.options.values()) {
     if (!option.parameter) {
@@ -11,7 +11,7 @@ function getBooleanOptions(command: ConsoleCommand): string[] {
   return options;
 }
 
-function getStringOptions(command: ConsoleCommand): string[] {
+function getStringOptions(command: AnyConsoleCommand): string[] {
   const options: string[] = [];
   for (const option of command.options.values()) {
     if (option.parameter) {
@@ -21,7 +21,9 @@ function getStringOptions(command: ConsoleCommand): string[] {
   return options;
 }
 
-function getDefaultOptions(command: ConsoleCommand): Record<string, unknown> {
+function getDefaultOptions(
+  command: AnyConsoleCommand,
+): Record<string, unknown> {
   const defaults: Record<string, unknown> = {};
   for (const option of command.options.values()) {
     const { name, parameter } = option;
@@ -32,7 +34,7 @@ function getDefaultOptions(command: ConsoleCommand): Record<string, unknown> {
   return defaults;
 }
 
-function getAliasOptions(command: ConsoleCommand): Record<string, string> {
+function getAliasOptions(command: AnyConsoleCommand): Record<string, string> {
   const aliases: Record<string, string> = {};
   for (const option of command.options.values()) {
     const { name, longFlags, shortFlags } = option;
@@ -55,7 +57,7 @@ export class ConsoleInputParser {
   public parse(
     { args, command }: {
       args: string[];
-      command: ConsoleCommand;
+      command: AnyConsoleCommand;
     },
   ): ParsedArguments {
     const options: ArgParsingOptions = {
@@ -76,7 +78,7 @@ export class ConsoleInputParser {
 
     const { _: parsedArguments, "--": dashes, ...parsedOptions } = parsedArgs;
     const afterDashes = Array.isArray(dashes) && dashes.length > 0
-      ? ["--", ...dashes] as string[]
+      ? (["--", ...dashes] as string[])
       : [];
     const allArguments = [...parsedArguments, ...afterDashes];
 

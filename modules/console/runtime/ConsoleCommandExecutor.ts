@@ -1,7 +1,7 @@
 import { debug } from "../../debugger/debug.ts";
 import { Context, createContext } from "../../context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
-import { ConsoleCommand } from "../define/ConsoleCommand.ts";
+import { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 import { ConsoleInputParser } from "./ConsoleInputParser.ts";
 
@@ -20,9 +20,10 @@ export class ConsoleCommandExecutor {
   }
 
   public async executeCommand(
-    { args, command, executableName, output }: {
+    { args, command, currentCommand, executableName, output }: {
       args: string[];
-      command: ConsoleCommand;
+      command: AnyConsoleCommand;
+      currentCommand: AnyConsoleCommand;
       executableName: string;
       output: ConsoleOutput;
     },
@@ -47,6 +48,7 @@ export class ConsoleCommandExecutor {
       localContext["executableName"] = executableName;
       localContext["options"] = options;
       localContext["output"] = output;
+      localContext["previousCommand"] = currentCommand;
     } catch (error: unknown) {
       if (error instanceof Error) {
         output.writeLine(error.message);

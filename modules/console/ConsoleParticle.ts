@@ -3,17 +3,17 @@ import { ServiceRegistry } from "../context/ServiceRegistry.ts";
 import { ExitCodeManager } from "../flux/ExitCodeManager.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
-import { ConsoleCommand } from "./define/ConsoleCommand.ts";
+import { AnyConsoleCommand } from "./define/ConsoleCommand.ts";
 import { ConfigCommand } from "./embedded/config/ConfigCommand.ts";
 import { ListConfigEntriesCommand } from "./embedded/config/ListConfigEntriesCommand.ts";
-import { HelpCommand } from "./embedded/HelpCommand.ts";
-import { MainCommand } from "./embedded/MainCommand.ts";
-import { VersionCommand } from "./embedded/VersionCommand.ts";
 import { ConsoleCommandExecutor } from "./runtime/ConsoleCommandExecutor.ts";
 import { ConsoleInputParser } from "./runtime/ConsoleInputParser.ts";
-import { ConsoleVersionProvider } from "./runtime/ConsoleVersionProvider.ts";
 import { StreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
 import { Context } from "../context/Context.ts";
+import { MainCommand } from "./embedded/main/MainCommand.ts";
+import { ConsoleVersionProvider } from "./embedded/version/ConsoleVersionProvider.ts";
+import { VersionCommand } from "./embedded/version/VersionCommand.ts";
+import { HelpCommand } from "./embedded/help/HelpCommand.ts";
 
 export class ConsoleParticle implements Particle {
   public async initServices(
@@ -43,7 +43,7 @@ export class ConsoleParticle implements Particle {
 
   public async initCommands(
     { commander }: {
-      commander: ConsoleCommand;
+      commander: AnyConsoleCommand;
     },
   ): Promise<void> {
     commander.registerCommand(new VersionCommand());
@@ -63,7 +63,7 @@ export class ConsoleParticle implements Particle {
       standardStreams,
       startUpArgs,
     }: {
-      commander: ConsoleCommand;
+      commander: AnyConsoleCommand;
       consoleCommandExecutor: ConsoleCommandExecutor;
       exitCodeManager: ExitCodeManager;
       standardStreams: StandardStreams;
@@ -74,6 +74,7 @@ export class ConsoleParticle implements Particle {
     const output = new StreamConsoleOutput({ stderr, stdout });
     const exitCode = await consoleCommandExecutor.executeCommand({
       args: [...startUpArgs],
+      currentCommand: commander,
       command: commander,
       executableName: "./console",
       output,
