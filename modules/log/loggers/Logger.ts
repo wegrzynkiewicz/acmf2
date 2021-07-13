@@ -1,7 +1,8 @@
 import { LoggerInput } from "./LoggerInput.ts";
 
 export interface Logger {
-  extend: (parameters: Record<string, unknown>) => Logger;
+  extend: (parameters: Record<string, unknown>) => void;
+  clone: (parameters: Record<string, unknown>) => Logger;
   emergency: (loggerInput: LoggerInput) => void;
   alert: (loggerInput: LoggerInput) => void;
   critical: (loggerInput: LoggerInput) => void;

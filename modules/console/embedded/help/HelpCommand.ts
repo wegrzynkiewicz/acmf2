@@ -27,7 +27,7 @@ export class HelpCommand
 
   public async execute(
     globalContext: Context,
-    { args, executableName, options, output, previousCommand}: {
+    { args, executableName, options, output, previousCommand }: {
       args: HelpCommandArgumentsInput;
       executableName: string;
       options: HelpCommandOptionsInput;

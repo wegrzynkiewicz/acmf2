@@ -7,7 +7,7 @@ import { LoggerInput } from "./LoggerInput.ts";
 export class BasicLogger implements Logger {
   public readonly currentDateProvider: CurrentDateProvider;
   public readonly logBus: LogBus;
-  public readonly additionalParameters: Record<string, unknown>;
+  protected additionalParameters: Record<string, unknown>;
 
   public constructor(
     { currentDateProvider, logBus }: {
@@ -24,11 +24,11 @@ export class BasicLogger implements Logger {
     this.additionalParameters = parameters;
   }
 
-  public extend(extendingParameters: Record<string, unknown>): Logger {
-    const { additionalParameters, currentDateProvider, logBus } = this;
+  public clone(additionalParameters: Record<string, unknown>): Logger {
+    const { currentDateProvider, logBus } = this;
     const parameters = {
+      ...this.additionalParameters,
       ...additionalParameters,
-      ...extendingParameters,
     };
     const logger = new BasicLogger(
       { currentDateProvider, logBus },
@@ -36,6 +36,13 @@ export class BasicLogger implements Logger {
       { parameters },
     );
     return logger;
+  }
+
+  public extend(extendingParameters: Record<string, unknown>): void {
+    this.additionalParameters = {
+      ...this.additionalParameters,
+      ...extendingParameters,
+    };
   }
 
   public emergency(loggerInput: LoggerInput): void {

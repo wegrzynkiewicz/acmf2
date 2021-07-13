@@ -2,8 +2,12 @@ import { Logger } from "./Logger.ts";
 import { LoggerInput } from "./LoggerInput.ts";
 
 export class NullLogger implements Logger {
-  public extend(parameters: Record<string, unknown>): Logger {
-    return this;
+  public clone(additionalParameters: Record<string, unknown>): Logger {
+    return new NullLogger();
+  }
+
+  public extend(parameters: Record<string, unknown>): void {
+    // nothing
   }
 
   public emergency(loggerInput: LoggerInput): void {
