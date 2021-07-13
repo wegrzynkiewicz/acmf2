@@ -42,6 +42,6 @@ export type LayoutCommandArgumentsProperties<T> = {
 };
 
 export interface LayoutCommandArguments<T> extends LayoutObject<T> {
-  order: (keyof T)[];
+  order: (Extract<keyof T, string>)[];
   properties: LayoutCommandArgumentsProperties<T>;
 }

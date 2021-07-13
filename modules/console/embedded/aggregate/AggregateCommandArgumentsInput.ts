@@ -1,8 +1,8 @@
 import { LayoutCommandArguments } from "../../layout/layoutArguments.ts";
 
 export interface AggregateCommandArgumentsInput {
-  arguments?: string[];
-  command?: string;
+  arguments: string[];
+  command: string;
 }
 
 export const aggregateCommandArgumentsInputLayout: LayoutCommandArguments<
@@ -11,6 +11,7 @@ export const aggregateCommandArgumentsInputLayout: LayoutCommandArguments<
   order: ["command", "arguments"],
   properties: {
     arguments: {
+      default: [],
       description: "The arguments to pass to command.",
       items: {
         type: "string",
@@ -18,6 +19,7 @@ export const aggregateCommandArgumentsInputLayout: LayoutCommandArguments<
       type: "array",
     },
     command: {
+      default: "",
       description: "The command to execute.",
       type: "string",
     },

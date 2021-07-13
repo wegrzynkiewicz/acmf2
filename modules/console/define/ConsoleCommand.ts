@@ -53,10 +53,10 @@ export class ConsoleCommand<
     }
 
     if (argumentsLayout !== undefined) {
-      const args = Object.entries(argumentsLayout.properties);
-      for (const [name, layout] of args) {
-        const { default: defaults, description, type } =
-          layout as LayoutCommandArgument;
+      for (const name of argumentsLayout.order) {
+        const layout = argumentsLayout.properties[name];
+        const propertyLayout = layout as LayoutCommandArgument;
+        const { default: defaults, description, type } = propertyLayout;
         const argument = new ConsoleArgument({
           defaults,
           description,
