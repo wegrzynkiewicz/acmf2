@@ -27,6 +27,7 @@ export class ParticleManager {
   public registerParticle(particle: Particle): void {
     const particleName = getPrototypeName(particle);
     debug({
+      channel: "FLUX",
       kind: "particle-registering",
       message: `Registering particle (${particleName})...`,
     });
@@ -47,6 +48,7 @@ export class ParticleManager {
     if (typeof particle[stageName] === "function") {
       const particleName = getPrototypeName(particle);
       debug({
+        channel: "FLUX",
         kind: "particle-executing",
         message: `Particle executing (${particleName}.${stageName})...`,
       });

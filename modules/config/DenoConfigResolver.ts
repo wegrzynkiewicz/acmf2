@@ -32,6 +32,7 @@ export class DenoConfigResolver {
 
     if (value !== undefined) {
       debug({
+        channel: "CONFIG",
         kind: "config-resolving",
         message: `Resolving config entry named (${key}) with value (${value}).`,
       });
@@ -40,6 +41,7 @@ export class DenoConfigResolver {
 
     if (defaults !== undefined) {
       debug({
+        channel: "CONFIG",
         kind: "config-resolving",
         message:
           `Resolving config entry named (${key}) with default value (${defaults}).`,

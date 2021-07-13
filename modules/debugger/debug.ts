@@ -1,7 +1,8 @@
 interface DebugOptions {
-  [key: string]: unknown;
+  channel: string;
   kind: string;
   message: string;
+  parameters?: Record<string, unknown>;
 }
 
 interface DebugFunction {
@@ -33,6 +34,7 @@ if (typeof Deno === "object") {
 }
 
 debug({
+  channel: "DEBUGGER",
   kind: "debugger-info",
   message: "Debugger enabled.",
 });

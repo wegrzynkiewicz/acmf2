@@ -28,25 +28,25 @@ export class ConsoleCommandExecutor {
       output: ConsoleOutput;
     },
   ): Promise<number> {
+    const argsString = args.join(" ");
     debug({
+      channel: "CONSOLE",
       kind: "console-command-executing",
-      message: `Executing command (${command.name}) with (${
-        args.join(" ")
-      })...`,
+      message: `Executing command (${command.name}) with (${argsString})...`,
     });
     const { globalContext, consoleInputParser } = this;
 
     let localContext: Context;
     try {
-      const { args: argsList, options } = consoleInputParser.parse({
+      const { argsInput, optionsInput } = consoleInputParser.parse({
         args,
         command,
       });
       localContext = createContext({ name: "localContext" });
-      localContext["args"] = argsList;
+      localContext["args"] = argsInput;
       localContext["command"] = command;
       localContext["executableName"] = executableName;
-      localContext["options"] = options;
+      localContext["options"] = optionsInput;
       localContext["output"] = output;
       localContext["previousCommand"] = currentCommand;
     } catch (error: unknown) {
@@ -64,6 +64,7 @@ export class ConsoleCommandExecutor {
       return 0;
     } catch (error: unknown) {
       if (error instanceof Breaker) {
+        output.error(error);
         return error.status;
       }
       if (error instanceof Error) {
@@ -71,7 +72,8 @@ export class ConsoleCommandExecutor {
       }
       throw new Breaker({
         error,
-        kind: "Unexpected console command error",
+        kind: "console-unexpected-error",
+        message: "Unexpected console command error.",
         status: 1,
       });
     }

@@ -1,11 +1,15 @@
+import { debug } from "../../debugger/debug.ts";
 import { ArgParsingOptions, parse } from "../../deps.ts";
+import { Breaker } from "../../flux/Breaker.ts";
 import { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
+import { LayoutCommandArgument } from "../layout/layoutArguments.ts";
 
 function getBooleanOptions(command: AnyConsoleCommand): string[] {
   const options: string[] = [];
-  for (const option of command.options.values()) {
-    if (!option.parameter) {
-      options.push(option.name);
+  const properties = Object.entries(command.optionsLayout.properties);
+  for (const [name, option] of properties) {
+    if (option.type === "boolean") {
+      options.push(name);
     }
   }
   return options;
@@ -13,9 +17,10 @@ function getBooleanOptions(command: AnyConsoleCommand): string[] {
 
 function getStringOptions(command: AnyConsoleCommand): string[] {
   const options: string[] = [];
-  for (const option of command.options.values()) {
-    if (option.parameter) {
-      options.push(option.name);
+  const properties = Object.entries(command.optionsLayout.properties);
+  for (const [name, option] of properties) {
+    if (option.type !== "boolean") {
+      options.push(name);
     }
   }
   return options;
@@ -25,19 +30,18 @@ function getDefaultOptions(
   command: AnyConsoleCommand,
 ): Record<string, unknown> {
   const defaults: Record<string, unknown> = {};
-  for (const option of command.options.values()) {
-    const { name, parameter } = option;
-    if (parameter) {
-      defaults[name] = parameter.defaults;
-    }
+  const properties = Object.entries(command.optionsLayout.properties);
+  for (const [name, option] of properties) {
+    defaults[name] = option.default;
   }
   return defaults;
 }
 
 function getAliasOptions(command: AnyConsoleCommand): Record<string, string> {
   const aliases: Record<string, string> = {};
-  for (const option of command.options.values()) {
-    const { name, longFlags, shortFlags } = option;
+  const properties = Object.entries(command.optionsLayout.properties);
+  for (const [name, option] of properties) {
+    const { longFlags, shortFlags } = option;
     for (const longFlag of longFlags) {
       aliases[longFlag] = name;
     }
@@ -48,9 +52,20 @@ function getAliasOptions(command: AnyConsoleCommand): Record<string, string> {
   return aliases;
 }
 
-export interface ParsedArguments {
-  args: Map<string, unknown>;
-  options: Map<string, unknown>;
+export interface ParsedInput {
+  argsInput: Record<string, unknown>;
+  optionsInput: Record<string, unknown>;
+}
+
+export type ArgumentType = number | string;
+
+export type OptionsType = {
+  [k: string]: any;
+};
+
+export interface ParsedFromCLI {
+  args: ArgumentType[];
+  options: OptionsType;
 }
 
 export class ConsoleInputParser {
@@ -59,7 +74,32 @@ export class ConsoleInputParser {
       args: string[];
       command: AnyConsoleCommand;
     },
-  ): ParsedArguments {
+  ): ParsedInput {
+    const parsed = this.parseFromCLI({
+      args,
+      command,
+    });
+    const argsInput = this.extractArguments({
+      args: parsed.args,
+      command,
+    });
+    const optionsInput = this.extractOptions({
+      options: parsed.options,
+      command,
+    });
+
+    return {
+      argsInput,
+      optionsInput,
+    };
+  }
+
+  public parseFromCLI(
+    { args, command }: {
+      args: string[];
+      command: AnyConsoleCommand;
+    },
+  ): ParsedFromCLI {
     const options: ArgParsingOptions = {
       "--": true,
       alias: getAliasOptions(command),
@@ -69,12 +109,26 @@ export class ConsoleInputParser {
       string: getStringOptions(command),
       unknown: (argument) => {
         if (argument.startsWith("-")) {
-          throw new Error(`Unknown option named (${argument}).`);
+          throw new Breaker({
+            kind: "console-option-unexpected",
+            message: `Passed unexpected option named (${argument}).`,
+            status: 1,
+          });
         }
         return true;
       },
     };
     const parsedArgs = parse(args, options);
+
+    debug({
+      channel: "CONSOLE",
+      kind: "console-arguments-parsing",
+      message: `Parsing command (${command.name}) arguments...`,
+      parameters: {
+        inputArgs: args,
+        parsedArgs,
+      },
+    });
 
     const { _: parsedArguments, "--": dashes, ...parsedOptions } = parsedArgs;
     const afterDashes = Array.isArray(dashes) && dashes.length > 0
@@ -82,30 +136,97 @@ export class ConsoleInputParser {
       : [];
     const allArguments = [...parsedArguments, ...afterDashes];
 
-    const argumentsMap = new Map<string, unknown>();
-    const filteredArguments = allArguments.map((a) => a.toString());
-    for (const argument of command.args.values()) {
-      const argumentValue = argument.digValueFromArray(filteredArguments);
-      argument.assert(argumentValue);
-      argumentsMap.set(argument.name, argumentValue);
-    }
-
-    if (filteredArguments.length > 0) {
-      throw new Error(
-        `Passed more arguments then expected count (${command.args.size}).`,
-      );
-    }
-
-    const optionMap = new Map<string, unknown>();
-    for (const option of command.options.values()) {
-      const optionValue = parsedOptions[option.name] as unknown;
-      option.assert(optionValue);
-      optionMap.set(option.name, optionValue);
-    }
-
     return {
-      args: argumentsMap,
-      options: optionMap,
+      args: allArguments,
+      options: parsedOptions,
     };
+  }
+
+  public extractArguments(
+    { args, command }: {
+      args: ArgumentType[];
+      command: AnyConsoleCommand;
+    },
+  ): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    const { order, properties, required } = command.argumentsLayout;
+    const argsList = [...args];
+
+    for (const name of order) {
+      const property = properties[name] as LayoutCommandArgument;
+      const isRequired = required.includes(name);
+
+      if (isRequired && argsList.length === 0) {
+        throw new Breaker({
+          args: { name },
+          kind: "console-argument-missing",
+          message: `Not passed required argument named (${name}).`,
+          status: 1,
+        });
+      }
+
+      if (property.type === "array") {
+        const values = argsList.splice(0);
+        result[name] = values.length === 0 ? property.default : values;
+        continue;
+      }
+
+      const value = argsList.shift();
+      if (value === undefined && property.default) {
+        result[name] = property.default;
+        continue;
+      }
+
+      result[name] = value;
+    }
+
+    if (argsList.length > 0) {
+      const size = Object.keys(properties).length;
+      throw new Breaker({
+        kind: "console-overflow-arguments",
+        message: `Passed more arguments then expected count (${size}).`,
+        status: 1,
+      });
+    }
+
+    return result;
+  }
+
+  public extractOptions(
+    { command, options }: {
+      command: AnyConsoleCommand;
+      options: OptionsType;
+    },
+  ): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    const { properties, required } = command.optionsLayout;
+    for (const [name, option] of Object.entries(properties)) {
+      const value = options[name];
+      const isRequired = required.includes(name);
+
+      if (value === undefined) {
+        if (isRequired) {
+          throw new Breaker({
+            args: { name },
+            kind: "console-option-missing",
+            message: `Not passed required option named (${name}).`,
+            status: 1,
+          });
+        }
+        result[name] = option.default;
+        continue;
+      }
+
+      if (option.type === "boolean" && typeof value !== "boolean") {
+        throw new Breaker({
+          kind: "console-boolean-invalid",
+          message: `Option named (${name}) received value, which not expected.`,
+          status: 1,
+        });
+      }
+
+      result[name] = value;
+    }
+    return result;
   }
 }

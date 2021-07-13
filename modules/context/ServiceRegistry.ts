@@ -20,6 +20,7 @@ export class ServiceRegistry {
   public registerServices(services: Record<string, unknown>): void {
     for (const [serviceKey, service] of Object.entries(services)) {
       debug({
+        channel: "CONTEXT",
         kind: "context-service-registering",
         message: `Registering service (${serviceKey.toString()}).`,
       });

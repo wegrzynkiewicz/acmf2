@@ -38,11 +38,11 @@ export class ListConfigEntriesCommand
     },
     { executableName, options, output }: {
       executableName: string;
-      options: Map<string, unknown>;
+      options: HelpCommandOptionsInput;
       output: ConsoleOutput;
     },
   ): Promise<number> {
-    if (options.get("help") === true) {
+    if (options.help === true) {
       const usagePrinter = new UsagePrinter({ executableName, output });
       usagePrinter.writeHelp(this);
       return 0;

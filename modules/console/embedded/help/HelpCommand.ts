@@ -1,3 +1,4 @@
+import { Context } from "../../../context/Context.ts";
 import {
   AnyConsoleCommand,
   ConsoleCommand,
@@ -25,14 +26,13 @@ export class HelpCommand
   }
 
   public async execute(
-    { commander }: {
-      commander: AnyConsoleCommand;
-    },
-    { args, executableName, options, output }: {
+    globalContext: Context,
+    { args, executableName, options, output, previousCommand}: {
       args: HelpCommandArgumentsInput;
       executableName: string;
       options: HelpCommandOptionsInput;
       output: ConsoleOutput;
+      previousCommand: AnyConsoleCommand;
     },
   ): Promise<number> {
     const usagePrinter = new UsagePrinter({ executableName, output });
@@ -40,7 +40,7 @@ export class HelpCommand
       usagePrinter.writeHelp(this);
       return 0;
     }
-    const command = commander.getCommandByName(args.command);
+    const command = previousCommand.getCommandByName(args.command);
     usagePrinter.writeHelp(command);
     return 0;
   }

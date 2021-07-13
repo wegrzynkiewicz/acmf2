@@ -50,6 +50,7 @@ export class ConsoleParticle implements Particle {
     commander.registerCommand(new HelpCommand());
 
     const configCommand = new ConfigCommand();
+    configCommand.registerCommand(new HelpCommand());
     configCommand.registerCommand(new ListConfigEntriesCommand());
 
     commander.registerCommand(configCommand);

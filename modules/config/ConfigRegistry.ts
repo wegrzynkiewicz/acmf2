@@ -10,6 +10,7 @@ export class ConfigRegistry {
       throw new Error(`Configuration entry named (${key}) already exists.`);
     }
     debug({
+      channel: "CONFIG",
       kind: "config-entry-registering",
       message: `Registering config key (${key}).`,
     });

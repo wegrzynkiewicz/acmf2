@@ -12,6 +12,7 @@ import {
 import { ConsoleArgument } from "./ConsoleArgument.ts";
 import { ConsoleOption } from "./ConsoleOption.ts";
 import { ConsoleOptionParameter } from "./ConsoleOptionParameter.ts";
+import { Breaker } from "../../flux/Breaker.ts";
 
 export type AnyConsoleCommand = ConsoleCommand<
   any | undefined,
@@ -105,6 +106,7 @@ export class ConsoleCommand<
   public registerCommand(command: AnyConsoleCommand): void {
     const { name } = command;
     debug({
+      channel: "CONSOLE",
       kind: "console-command-registering",
       message:
         `Registering console command (${name}) to parent command (${this.name})`,
@@ -121,7 +123,12 @@ export class ConsoleCommand<
         return command;
       }
     }
-    throw new Error(`Command named (${commandName}) not exists.`);
+    throw new Breaker({
+      kind: "console-command-missing",
+      message:
+        `Command named (${commandName}) not exists in parent command (${this.name}).`,
+      status: 1,
+    });
   }
 
   public execute(
