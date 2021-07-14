@@ -57,8 +57,6 @@ export class LogParticle implements Particle {
       globalContext,
       serviceRegistry,
     });
-    const logger = loggerFactory.produceLogger({ channel: "ROOT" });
-
-    serviceRegistry.registerServices({ logBus, logger, loggerFactory });
+    serviceRegistry.registerServices({ logBus, loggerFactory });
   }
 }

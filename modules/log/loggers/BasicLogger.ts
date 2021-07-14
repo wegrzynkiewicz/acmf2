@@ -14,7 +14,6 @@ export class BasicLogger implements Logger {
       currentDateProvider: CurrentDateProvider;
       logBus: LogBus;
     },
-    localContext: undefined,
     { parameters }: {
       parameters: Record<string, unknown>;
     },
@@ -32,7 +31,6 @@ export class BasicLogger implements Logger {
     };
     const logger = new BasicLogger(
       { currentDateProvider, logBus },
-      undefined,
       { parameters },
     );
     return logger;

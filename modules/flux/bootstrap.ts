@@ -15,7 +15,7 @@ export async function bootstrap(
   serviceRegistry.registerServices({ particleManager, serviceRegistry });
 
   for (const particle of particles) {
-    particleManager.registerParticle(particle);
+    await particleManager.registerParticle(particle);
   }
 
   await particleManager.run("bootstrap");

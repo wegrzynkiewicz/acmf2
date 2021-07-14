@@ -4,7 +4,6 @@ import { Logger } from "../loggers/Logger.ts";
 export interface LoggerConstructor {
   new (
     globalContext: Context,
-    localContext: undefined,
     options: {
       parameters: Context;
     },
@@ -20,7 +19,6 @@ export class LoggerFactory {
     { globalContext }: {
       globalContext: Context;
     },
-    localContext: undefined,
     { loggerConstructor, parameters }: {
       loggerConstructor: LoggerConstructor;
       parameters: Context;
@@ -45,7 +43,6 @@ export class LoggerFactory {
     };
     const logger = new loggerConstructor(
       globalContext,
-      undefined,
       { parameters },
     );
     return logger;

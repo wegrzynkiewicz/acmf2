@@ -5,12 +5,20 @@ import {
 } from "../../console/define/ConsoleCommand.ts";
 import { Context } from "../../context/Context.ts";
 import { ServiceRegistry } from "../../context/ServiceRegistry.ts";
+import { ParticleManager } from "./ParticleManager.ts";
 
 export interface Particle {
   bootstrap?: (
     globalContext: {
       globalContext: Context;
       serviceRegistry: ServiceRegistry;
+    },
+  ) => Promise<void>;
+
+  initParticles?: (
+    globalContext: {
+      globalContext: Context;
+      particleManager: ParticleManager;
     },
   ) => Promise<void>;
 

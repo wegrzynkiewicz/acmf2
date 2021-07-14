@@ -18,7 +18,6 @@ export async function provideLoggerFactory(
   ) as LoggerConstructor;
   const loggerFactory = new LoggerFactory(
     { globalContext },
-    undefined,
     { loggerConstructor, parameters: {} },
   );
 
