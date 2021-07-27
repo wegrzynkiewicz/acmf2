@@ -4,10 +4,9 @@ interface FluxEvents {
 
 type Mapper = {
   [K in keyof FluxEvents]: Set<FluxEvents[K]>;
-}
+};
 
 export class EventManager {
-
   protected readonly map: Mapper = {
     exit: new Set(),
   };
@@ -16,7 +15,6 @@ export class EventManager {
     eventName: K,
     listener: FluxEvents[K],
   ): Promise<void> {
-    // @ts-ignore
     this.map[eventName].add(listener);
   }
 
@@ -27,7 +25,7 @@ export class EventManager {
     const list = [...this.map[eventName].values()];
     const promises = list.map(async (listener) => {
       listener.apply(args);
-    })
+    });
     await Promise.all(promises);
   }
 }

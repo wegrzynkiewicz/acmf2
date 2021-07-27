@@ -1,4 +1,4 @@
-import { LayoutCommandOptions } from "../../layout/layoutOptions.ts";
+import { LayoutObject } from "../../../layout/layout.ts";
 import { helpCommandOptionLayout } from "../help/HelpCommandOptionsInput.ts";
 import { quietCommandOptionLayout } from "../quiet/quietCommandOptionLayout.ts";
 
@@ -7,13 +7,12 @@ export interface MainCommandOptionsInput {
   quiet: boolean;
 }
 
-export const mainCommandOptionsInputLayout: LayoutCommandOptions<
+export const mainCommandOptionsInputLayout: LayoutObject<
   MainCommandOptionsInput
 > = {
   properties: {
     help: helpCommandOptionLayout,
     quiet: quietCommandOptionLayout,
   },
-  required: [],
   type: "object",
 };

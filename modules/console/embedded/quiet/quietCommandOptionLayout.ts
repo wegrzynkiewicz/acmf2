@@ -1,9 +1,11 @@
-import { LayoutCommandBooleanOption } from "../../layout/layoutOptions.ts";
+import { LayoutBoolean } from "../../../layout/layout.ts";
 
-export const quietCommandOptionLayout: LayoutCommandBooleanOption = {
-  default: false,
+export const quietCommandOptionLayout: LayoutBoolean = {
+  defaults: false,
   description: "Do not output any message.",
+  metadata: {
+    longFlags: ["quiet"],
+    shortFlags: ["q"],
+  },
   type: "boolean",
-  longFlags: ["quiet"],
-  shortFlags: ["q"],
 };

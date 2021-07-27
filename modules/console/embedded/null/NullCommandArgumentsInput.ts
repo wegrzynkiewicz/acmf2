@@ -1,12 +1,12 @@
-import { LayoutCommandArguments } from "../../layout/layoutArguments.ts";
+import { LayoutObject } from "../../../layout/layout.ts";
 
 export interface NullCommandArgumentsInput {}
 
-export const nullCommandArgumentsInputLayout: LayoutCommandArguments<
+export const nullCommandArgumentsInputLayout: LayoutObject<
   NullCommandArgumentsInput
 > = {
-  order: [],
-  properties: {},
-  required: [],
+  metadata: {
+    order: [],
+  },
   type: "object",
 };

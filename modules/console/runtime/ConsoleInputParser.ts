@@ -1,8 +1,8 @@
 import { debug } from "../../debugger/debug.ts";
 import { ArgParsingOptions, parse } from "../../deps.ts";
 import { Breaker } from "../../flux/Breaker.ts";
+import { isPrimitiveLayout } from "../../layout/helpers/isPrimitiveLayout.ts";
 import { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
-import { LayoutCommandArgument } from "../layout/layoutArguments.ts";
 
 function getBooleanOptions(command: AnyConsoleCommand): string[] {
   const options: string[] = [];
@@ -32,7 +32,9 @@ function getDefaultOptions(
   const defaults: Record<string, unknown> = {};
   const properties = Object.entries(command.optionsLayout.properties);
   for (const [name, option] of properties) {
-    defaults[name] = option.default;
+    if (isPrimitiveLayout(option)) {
+      defaults[name] = option.defaults;
+    }
   }
   return defaults;
 }
@@ -41,7 +43,9 @@ function getAliasOptions(command: AnyConsoleCommand): Record<string, string> {
   const aliases: Record<string, string> = {};
   const properties = Object.entries(command.optionsLayout.properties);
   for (const [name, option] of properties) {
-    const { longFlags, shortFlags } = option;
+    const metadata = option.metadata ?? {};
+    const longFlags = (metadata.longFlag ?? []) as string[];
+    const shortFlags = (metadata.shortFlags ?? []) as string[];
     for (const longFlag of longFlags) {
       aliases[longFlag] = name;
     }
@@ -149,12 +153,14 @@ export class ConsoleInputParser {
     },
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    const { order, properties, required } = command.argumentsLayout;
+    const { metadata, properties, required } = command.argumentsLayout;
+    const requiredProperties = required ?? {};
+    const order = (metadata?.order ?? []) as string[];
     const argsList = [...args];
 
     for (const name of order) {
-      const property = properties[name] as LayoutCommandArgument;
-      const isRequired = required.includes(name);
+      const property = properties[name];
+      const isRequired = requiredProperties[name] ?? true;
 
       if (isRequired && argsList.length === 0) {
         throw new Breaker({
@@ -167,13 +173,15 @@ export class ConsoleInputParser {
 
       if (property.type === "array") {
         const values = argsList.splice(0);
-        result[name] = values.length === 0 ? property.default : values;
+        result[name] = values.length === 0 ? [] : values;
         continue;
       }
 
       const value = argsList.shift();
-      if (value === undefined && property.default) {
-        result[name] = property.default;
+      if (
+        value === undefined && isPrimitiveLayout(property) && property.defaults
+      ) {
+        result[name] = property.defaults;
         continue;
       }
 
@@ -200,12 +208,20 @@ export class ConsoleInputParser {
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     const { properties, required } = command.optionsLayout;
-    for (const [name, option] of Object.entries(properties)) {
+    const requiredProperties = required ?? {};
+    for (const [name, propertyLayout] of Object.entries(properties)) {
       const value = options[name];
-      const isRequired = required.includes(name);
+
+      if (!isPrimitiveLayout(propertyLayout)) {
+        throw new Breaker({
+          kind: "console-unexpected-option-type",
+          message: `Option named (${name}) received value, which not expected.`,
+          status: 1,
+        });
+      }
 
       if (value === undefined) {
-        if (isRequired) {
+        if (requiredProperties[name]) {
           throw new Breaker({
             args: { name },
             kind: "console-option-missing",
@@ -213,11 +229,11 @@ export class ConsoleInputParser {
             status: 1,
           });
         }
-        result[name] = option.default;
+        result[name] = propertyLayout.defaults;
         continue;
       }
 
-      if (option.type === "boolean" && typeof value !== "boolean") {
+      if (propertyLayout.type === "boolean" && typeof value !== "boolean") {
         throw new Breaker({
           kind: "console-boolean-invalid",
           message: `Option named (${name}) received value, which not expected.`,

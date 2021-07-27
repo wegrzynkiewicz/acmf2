@@ -1,49 +1,130 @@
-import { JSONSchema7 } from "../schema/jsonSchema7.ts";
+type IsNullable<T> = (
+  unknown extends T ? boolean
+    : null extends T ? true
+    : false
+);
+type IsRequired<T> = (
+  unknown extends T ? boolean
+    : undefined extends T ? false
+    : true
+);
 
-export type LayoutTypeName =
-  | "string"
-  | "number"
-  | "integer"
-  | "boolean"
-  | "object"
-  | "array"
-  | "null";
-
-export interface LayoutBase extends JSONSchema7 {
-  description?: string;
-  title?: string;
-  type: LayoutTypeName;
+export interface LayoutNullable {
+  readonly nullable?: boolean;
 }
 
-type LayoutType = unknown[] | number | object | string;
+export interface LayoutBase {
+  readonly id?: string;
+  readonly description?: string;
+  readonly metadata?: Record<string, unknown>;
+  readonly title?: string;
+}
 
-type LayoutPropertyType<T> = T extends LayoutType[] ? LayoutArray<T[number]>
-  : T extends number ? LayoutNumber
-  : T extends string ? LayoutString
-  : LayoutObject<T>;
+export interface LayoutAny extends LayoutBase {
+  readonly type: "any";
+}
 
-type LayoutObjectProperties<T> = {
-  [K in keyof Required<T>]: LayoutPropertyType<Required<T[K]>>;
+export interface LayoutArray<T> extends LayoutBase, LayoutNullable {
+  readonly type: "array";
+  readonly items: LayoutDescriptor<T>;
+}
+
+export interface LayoutBoolean extends LayoutBase, LayoutNullable {
+  readonly defaults?: boolean;
+  readonly type: "boolean";
+}
+
+export interface LayoutEnumerable extends LayoutBase, LayoutNullable {
+  readonly defaults?: string;
+  readonly type: "enumerable";
+  readonly values: ReadonlyArray<string>;
+}
+
+export interface LayoutFloat extends LayoutBase, LayoutNullable {
+  readonly defaults?: number;
+  readonly type: "float";
+}
+
+export interface LayoutInteger extends LayoutBase, LayoutNullable {
+  readonly defaults?: number;
+  readonly type: "integer";
+}
+
+export interface LayoutNull extends LayoutBase {
+  readonly type: "null";
+}
+
+export type LayoutNumber = LayoutFloat | LayoutInteger;
+
+export type LayoutObjectRequired<T> = {
+  readonly [K in keyof T]+?: boolean;
 };
 
-interface LayoutArray<T> extends LayoutBase {
-  type: "array";
-  items: T extends number ? LayoutNumber
-    : T extends string ? LayoutString
-    : LayoutObject<T>;
+export type LayoutObjectProperties<T> = {
+  readonly [K in keyof T]-?: LayoutDescriptor<T[K]>;
+};
+
+export interface LayoutObject<T> extends LayoutBase, LayoutNullable {
+  readonly properties: LayoutObjectProperties<T>;
+  readonly required?: LayoutObjectRequired<T>;
+  readonly type: "object";
 }
 
-export interface LayoutObject<T> extends LayoutBase {
-  properties: LayoutObjectProperties<T>;
-  required: string[];
+export type LayoutPrimitive =
+  | LayoutBoolean
+  | LayoutFloat
+  | LayoutInteger
+  | LayoutString;
+
+export interface LayoutReference extends LayoutBase, LayoutNullable {
+  readonly link: string;
+  readonly type: "reference";
 }
 
-export interface LayoutNumber extends LayoutBase {
-  default?: number;
-  type: "number";
+export interface LayoutString extends LayoutBase, LayoutNullable {
+  readonly defaults?: string;
+  readonly restrictions?: {
+    readonly maxLength?: number;
+    readonly minLength?: number;
+  };
+  readonly type: "string";
 }
 
-export interface LayoutString extends LayoutBase {
-  default?: string;
-  type: "string";
+export interface LayoutDictionary<T> extends LayoutBase, LayoutNullable {
+  readonly type: "dictionary";
+  readonly items: LayoutDescriptor<T>;
 }
+
+export type LayoutRecord<T extends Record<string, unknown>> =
+  | LayoutObject<T>
+  | LayoutDictionary<T>;
+
+export type LayoutDescriptor<T> = (
+  | LayoutAny
+  | LayoutEnumerable
+  | LayoutReference
+  | (
+    unknown extends T ? Layout
+      : [Exclude<T, null | undefined>] extends [Array<infer U>] ? LayoutArray<U>
+      : [T] extends [null | undefined] ? LayoutNull
+      : [Exclude<T, null | undefined>] extends [boolean] ? LayoutBoolean
+      : [Exclude<T, null | undefined>] extends [string] ? LayoutString
+      : [Exclude<T, null | undefined>] extends [number] ? LayoutNumber
+      : T extends Record<string, infer U> ? LayoutDictionary<U>
+      : LayoutObject<T>
+  )
+);
+
+export type Layout = (
+  | LayoutAny
+  | LayoutArray<unknown>
+  | LayoutBoolean
+  | LayoutEnumerable
+  | LayoutFloat
+  | LayoutDictionary<unknown>
+  | LayoutInteger
+  | LayoutNull
+  | LayoutObject<unknown>
+  | LayoutString
+  | LayoutReference
+);

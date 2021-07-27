@@ -32,7 +32,7 @@ export class ParticleManager {
       message: `Registering particle (${particleName})...`,
     });
     this.particles.add(particle);
-    await this.runSingleParticleStage(particle, 'initParticles');
+    await this.runSingleParticleStage(particle, "initParticles");
   }
 
   public async run<K extends keyof Particle>(stageName: K): Promise<void> {

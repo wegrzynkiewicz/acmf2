@@ -8,8 +8,13 @@ export class DebuggerParticle implements Particle {
     },
   ): Promise<void> {
     configRegistry.registerEntry({
+      comment: "Enabling the built-in debugger logger.",
       defaults: "0",
       key: "APP_DEBUGGER_ENABLED",
+      layout: {
+        type: "enumerable",
+        values: ["0", "1"],
+      },
     });
   }
 }

@@ -1,5 +1,7 @@
+import { Layout } from "../layout/layout.ts";
+
 export interface ConfigEntry {
-  comment?: string;
   defaults?: string;
   key: string;
+  layout: Layout;
 }

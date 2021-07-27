@@ -1,8 +1,8 @@
+import { LayoutObject } from "../../../layout/layout.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { ConsoleCommandExecutor } from "../../runtime/ConsoleCommandExecutor.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import { LayoutCommandOptions } from "../../layout/layoutOptions.ts";
 import {
   AggregateCommandArgumentsInput,
   aggregateCommandArgumentsInputLayout,
@@ -15,7 +15,7 @@ export class AggregateCommand<
     { description, name, optionsLayout }: {
       description?: string;
       name: string;
-      optionsLayout: LayoutCommandOptions<OptionsType>;
+      optionsLayout: LayoutObject<OptionsType>;
     },
   ) {
     super({
