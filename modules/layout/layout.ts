@@ -56,13 +56,17 @@ export interface LayoutNull extends LayoutBase {
 
 export type LayoutNumber = LayoutFloat | LayoutInteger;
 
-export type LayoutObjectRequired<T> = {
-  readonly [K in keyof T]+?: boolean;
-};
+export type LayoutObjectRequired<T> =
+  & {
+    readonly [K in keyof T]+?: boolean;
+  }
+  & (unknown extends T ? { [K: string]: boolean } : {});
 
-export type LayoutObjectProperties<T> = {
-  readonly [K in keyof T]-?: LayoutDescriptor<T[K]>;
-};
+export type LayoutObjectProperties<T> =
+  & {
+    readonly [K in keyof T]-?: LayoutDescriptor<T[K]>;
+  }
+  & (unknown extends T ? { [K: string]: Layout } : {});
 
 export interface LayoutObject<T> extends LayoutBase, LayoutNullable {
   readonly properties: LayoutObjectProperties<T>;
@@ -95,7 +99,7 @@ export interface LayoutDictionary<T> extends LayoutBase, LayoutNullable {
   readonly items: LayoutDescriptor<T>;
 }
 
-export type LayoutRecord<T extends Record<string, unknown>> =
+export type LayoutRecord<T> =
   | LayoutObject<T>
   | LayoutDictionary<T>;
 

@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
-    "Deno"
+    "Deno",
+    "acmf"
   ],
   "deno.enable": true,
   "editor.defaultFormatter": "denoland.vscode-deno",

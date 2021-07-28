@@ -10,7 +10,7 @@ import {
 
 export class AggregateCommand<
   OptionsType extends { help: boolean },
-> extends ConsoleCommand<AggregateCommandArgumentsInput, OptionsType> {
+> extends ConsoleCommand {
   public constructor(
     { description, name, optionsLayout }: {
       description?: string;

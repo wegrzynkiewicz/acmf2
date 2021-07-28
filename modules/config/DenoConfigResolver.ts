@@ -1,6 +1,7 @@
 import { debug } from "../debugger/debug.ts";
+import { isPrimitiveLayout } from "../layout/helpers/isPrimitiveLayout.ts";
+import { Layout } from "../layout/layout.ts";
 import { Config } from "./Config.ts";
-import { ConfigEntry } from "./ConfigEntry.ts";
 import { ConfigRegistry } from "./ConfigRegistry.ts";
 
 export class DenoConfigResolver {
@@ -11,15 +12,20 @@ export class DenoConfigResolver {
   ): Promise<Config> {
     const { entries } = configRegistry;
     const config = new Config({ entries });
-    for (const entry of entries.values()) {
-      const value = this.resolveEntry(entry);
-      config.set(entry.key, value);
+    for (const [key, layout] of entries.entries()) {
+      const value = this.resolveEntry({ key, layout });
+      config.set(key, value);
     }
     return config;
   }
 
-  public resolveEntry(entry: ConfigEntry): string {
-    const { defaults, key } = entry;
+  public resolveEntry(
+    { key, layout }: {
+      key: string;
+      layout: Layout;
+    },
+  ): unknown {
+    const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
 
     let value: string | undefined = undefined;
     try {
@@ -47,6 +53,16 @@ export class DenoConfigResolver {
           `Resolving config entry named (${key}) with default value (${defaults}).`,
       });
       return defaults;
+    }
+
+    if (layout.type === 'array') {
+      debug({
+        channel: "CONFIG",
+        kind: "config-resolving",
+        message:
+          `Resolving config entry named (${key}) with empty array.`,
+      });
+      return []; // TODO:
     }
 
     throw new Error(`Cannot resolve config option named (${key}).`);

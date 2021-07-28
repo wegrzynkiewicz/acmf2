@@ -1,5 +1,6 @@
 import { ConfigRegistry } from "../config/ConfigRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
+import { debugConfigLayout } from "./DebugConfig.ts";
 
 export class DebuggerParticle implements Particle {
   public async initConfig(
@@ -7,14 +8,6 @@ export class DebuggerParticle implements Particle {
       configRegistry: ConfigRegistry;
     },
   ): Promise<void> {
-    configRegistry.registerEntry({
-      comment: "Enabling the built-in debugger logger.",
-      defaults: "0",
-      key: "APP_DEBUGGER_ENABLED",
-      layout: {
-        type: "enumerable",
-        values: ["0", "1"],
-      },
-    });
+    configRegistry.registerEntriesFromLayout(debugConfigLayout);
   }
 }

@@ -1,7 +1,6 @@
-import type { ConsoleArgument } from "../define/ConsoleArgument.ts";
-import type { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
-import type { ConsoleOption } from "../define/ConsoleOption.ts";
-import type { ConsoleOptionParameter } from "../define/ConsoleOptionParameter.ts";
+import { isPrimitiveLayout } from "../../layout/helpers/isPrimitiveLayout.ts";
+import { Layout } from "../../layout/layout.ts";
+import { ConsoleCommand } from "../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 
 export interface UsageInfo {
@@ -23,7 +22,7 @@ export class UsagePrinter {
     this.output = output;
   }
 
-  public writeHelp(command: AnyConsoleCommand): void {
+  public writeHelp(command: ConsoleCommand): void {
     this.writeCommandUsage(command);
     this.writeCommandDescription(command);
     this.writeCommandAliases(command);
@@ -60,19 +59,26 @@ export class UsagePrinter {
     }
   }
 
-  public writeCommandUsage(command: AnyConsoleCommand): void {
-    const { args, hidden, name, options } = command;
+  public writeCommandUsage(command: ConsoleCommand): void {
+    const { argumentsLayout, hidden, name, optionsLayout } = command;
     this.output.write("Usage:");
     this.output.write(` ${this.executableName}`);
     if (name !== "" && !hidden) {
       this.output.write(` ${name}`);
     }
-    if (options.size > 0) {
+    if (Object.keys(optionsLayout.properties).length > 0) {
       this.output.write(" [options]");
     }
-    if (args.size > 0) {
-      for (const argument of args.values()) {
-        const commandArgumentLabel = this.getCommandArgumentLabel(argument);
+    const args = Object.entries(argumentsLayout.properties);
+    if (args.length > 0) {
+      const requiredProperties = argumentsLayout.required ?? {};
+      for (const [name, layout] of args) {
+        const required = requiredProperties[name] ?? false;
+        const commandArgumentLabel = this.getCommandArgumentLabel({
+          name,
+          layout,
+          required,
+        });
         this.output.write(` ${commandArgumentLabel}`);
       }
     }
@@ -80,7 +86,7 @@ export class UsagePrinter {
     this.output.writeLine("");
   }
 
-  public writeCommandDescription(command: AnyConsoleCommand): void {
+  public writeCommandDescription(command: ConsoleCommand): void {
     const { description } = command;
     if (description) {
       this.output.writeLine(description);
@@ -88,7 +94,7 @@ export class UsagePrinter {
     }
   }
 
-  public writeCommandAliases(command: AnyConsoleCommand): void {
+  public writeCommandAliases(command: ConsoleCommand): void {
     const { aliases } = command;
     if (aliases.size > 0) {
       this.output.writeLine("Aliases:");
@@ -98,68 +104,94 @@ export class UsagePrinter {
     }
   }
 
-  public getCommandArgumentLabel(argument: ConsoleArgument): string {
-    const { defaults, name, rest, required } = argument;
+  public getCommandArgumentLabel(
+    { name, layout, required }: {
+      name: string;
+      layout: Layout;
+      required: boolean;
+    },
+  ): string {
+    const rest = layout.type === "array";
+    const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
     let label = name;
     if (rest) {
       label += "...";
     }
-    if (typeof defaults === "string" && !rest) {
+    if (defaults !== undefined && !rest) {
       label += `="${defaults.toString()}"`;
     }
     label = required ? `<${label}>` : `[${label}]`;
     return label;
   }
 
-  public getCommandArguments(command: AnyConsoleCommand): UsageInfo[] {
+  public getCommandArguments(command: ConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
-    for (const argument of command.args.values()) {
+    const properties = Object.entries(command.argumentsLayout.properties);
+    const requiredProperties = command.argumentsLayout.required ?? {};
+    for (const [name, layout] of properties) {
+      const required = requiredProperties[name] ?? false;
+      const label = this.getCommandArgumentLabel({ layout, name, required });
       const argumentData: UsageInfo = {
-        header: `  ${this.getCommandArgumentLabel(argument)}`,
-        description: argument.description,
+        header: `  ${label}`,
+        description: layout.description ?? "",
       };
       table.push(argumentData);
     }
     return table;
   }
 
-  public getCommandOptions(command: AnyConsoleCommand): UsageInfo[] {
+  public getCommandOptions(command: ConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
-    for (const option of command.options.values()) {
+    const properties = Object.entries(command.optionsLayout);
+    const requiredProperties = command.optionsLayout.required ?? {};
+    for (const [name, layout] of properties) {
+      const required = requiredProperties[name] ?? false;
+      const label = this.getCommandOptionLabel({ name, layout, required });
       const optionRow: UsageInfo = {
-        header: `  ${this.getCommandOptionLabel(option)}`,
-        description: option.description,
+        header: `  ${label}`,
+        description: layout.description ?? "",
       };
       table.push(optionRow);
     }
     return table;
   }
 
-  public getCommandOptionLabel(option: ConsoleOption): string {
-    const { longFlags, parameter, shortFlags } = option;
+  public getCommandOptionLabel(
+    { name, layout, required }: {
+      name: string;
+      layout: Layout;
+      required: boolean;
+    },
+  ): string {
+    const { longFlags, shortFlags } = layout.metadata ?? {};
+
     const flags: string[] = [];
-    if (shortFlags.length > 0) {
+    if (Array.isArray(shortFlags) && shortFlags.length > 0) {
       for (const shortFlag of shortFlags) {
         flags.push(`-${shortFlag}`);
       }
     }
-    if (longFlags.length > 0) {
+    if (Array.isArray(longFlags) && longFlags.length > 0) {
       for (const longFlag of longFlags) {
         flags.push(`--${longFlag}`);
       }
     }
     let label = flags.join(", ");
-    if (parameter) {
+    if (layout.type !== "boolean") {
       label += "=";
-      label += this.getCommandOptionParameterLabel(parameter);
+      label += this.getCommandOptionParameterLabel({ name, layout, required });
     }
     return label;
   }
 
   public getCommandOptionParameterLabel(
-    parameter: ConsoleOptionParameter,
+    { name, layout, required }: {
+      name: string;
+      layout: Layout;
+      required: boolean;
+    },
   ): string {
-    const { defaults, name, required } = parameter;
+    const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
     let label = name;
     if (typeof defaults === "string") {
       label += `="${defaults}"`;
@@ -168,7 +200,7 @@ export class UsagePrinter {
     return label;
   }
 
-  public getSubCommands(command: AnyConsoleCommand): UsageInfo[] {
+  public getSubCommands(command: ConsoleCommand): UsageInfo[] {
     const list: UsageInfo[] = [];
     for (const child of command.commands.values()) {
       if (!child.hidden) {
@@ -178,7 +210,7 @@ export class UsagePrinter {
     return list;
   }
 
-  public getAvailableCommandDescription(command: AnyConsoleCommand): UsageInfo {
+  public getAvailableCommandDescription(command: ConsoleCommand): UsageInfo {
     const { name, description } = command;
     let header = `  ${name}`;
     const usageTable: UsageInfo = {

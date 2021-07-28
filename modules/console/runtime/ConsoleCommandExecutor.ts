@@ -1,9 +1,9 @@
 import { debug } from "../../debugger/debug.ts";
 import { Context, createContext } from "../../context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
-import { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 import { ConsoleInputParser } from "./ConsoleInputParser.ts";
+import { ConsoleCommand } from "../define/ConsoleCommand.ts";
 
 export class ConsoleCommandExecutor {
   private readonly globalContext: Context;
@@ -22,8 +22,8 @@ export class ConsoleCommandExecutor {
   public async executeCommand(
     { args, command, currentCommand, executableName, output }: {
       args: string[];
-      command: AnyConsoleCommand;
-      currentCommand: AnyConsoleCommand;
+      command: ConsoleCommand;
+      currentCommand: ConsoleCommand;
       executableName: string;
       output: ConsoleOutput;
     },

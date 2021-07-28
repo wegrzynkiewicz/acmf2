@@ -5,6 +5,14 @@ import { Context } from "./Context.ts";
 
 export type ServiceConstructor<T> = new (...args: any[]) => T;
 
+async function timeout(serviceKey: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Cannot resolve service named (${serviceKey}).`));
+    }, 500);
+  });
+}
+
 export class ServiceRegistry {
   private readonly context: Context;
   private readonly promises = new Map<string, Deferred<unknown>>();
@@ -41,8 +49,12 @@ export class ServiceRegistry {
     const promise = this.promises.get(serviceKey);
     if (promise === undefined) {
       const promise = deferred();
+      const race = Promise.race([
+        promise,
+        timeout(serviceKey),
+      ])
       this.promises.set(serviceKey, promise);
-      return promise as Promise<T>;
+      return race as Promise<T>;
     }
     return promise as Promise<T>;
   }

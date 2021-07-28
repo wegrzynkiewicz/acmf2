@@ -2,9 +2,9 @@ import { debug } from "../../debugger/debug.ts";
 import { ArgParsingOptions, parse } from "../../deps.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { isPrimitiveLayout } from "../../layout/helpers/isPrimitiveLayout.ts";
-import { AnyConsoleCommand } from "../define/ConsoleCommand.ts";
+import { ConsoleCommand } from "../define/ConsoleCommand.ts";
 
-function getBooleanOptions(command: AnyConsoleCommand): string[] {
+function getBooleanOptions(command: ConsoleCommand): string[] {
   const options: string[] = [];
   const properties = Object.entries(command.optionsLayout.properties);
   for (const [name, option] of properties) {
@@ -15,7 +15,7 @@ function getBooleanOptions(command: AnyConsoleCommand): string[] {
   return options;
 }
 
-function getStringOptions(command: AnyConsoleCommand): string[] {
+function getStringOptions(command: ConsoleCommand): string[] {
   const options: string[] = [];
   const properties = Object.entries(command.optionsLayout.properties);
   for (const [name, option] of properties) {
@@ -27,7 +27,7 @@ function getStringOptions(command: AnyConsoleCommand): string[] {
 }
 
 function getDefaultOptions(
-  command: AnyConsoleCommand,
+  command: ConsoleCommand,
 ): Record<string, unknown> {
   const defaults: Record<string, unknown> = {};
   const properties = Object.entries(command.optionsLayout.properties);
@@ -39,7 +39,7 @@ function getDefaultOptions(
   return defaults;
 }
 
-function getAliasOptions(command: AnyConsoleCommand): Record<string, string> {
+function getAliasOptions(command: ConsoleCommand): Record<string, string> {
   const aliases: Record<string, string> = {};
   const properties = Object.entries(command.optionsLayout.properties);
   for (const [name, option] of properties) {
@@ -76,7 +76,7 @@ export class ConsoleInputParser {
   public parse(
     { args, command }: {
       args: string[];
-      command: AnyConsoleCommand;
+      command: ConsoleCommand;
     },
   ): ParsedInput {
     const parsed = this.parseFromCLI({
@@ -101,7 +101,7 @@ export class ConsoleInputParser {
   public parseFromCLI(
     { args, command }: {
       args: string[];
-      command: AnyConsoleCommand;
+      command: ConsoleCommand;
     },
   ): ParsedFromCLI {
     const options: ArgParsingOptions = {
@@ -149,7 +149,7 @@ export class ConsoleInputParser {
   public extractArguments(
     { args, command }: {
       args: ArgumentType[];
-      command: AnyConsoleCommand;
+      command: ConsoleCommand;
     },
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
@@ -202,7 +202,7 @@ export class ConsoleInputParser {
 
   public extractOptions(
     { command, options }: {
-      command: AnyConsoleCommand;
+      command: ConsoleCommand;
       options: OptionsType;
     },
   ): Record<string, unknown> {

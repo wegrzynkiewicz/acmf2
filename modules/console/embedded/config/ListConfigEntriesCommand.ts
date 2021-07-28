@@ -1,5 +1,6 @@
 import { Config } from "../../../config/Config.ts";
 import { ConfigRegistry } from "../../../config/ConfigRegistry.ts";
+import { isPrimitiveLayout } from "../../../layout/helpers/isPrimitiveLayout.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { Table } from "../../runtime/Table.ts";
@@ -14,10 +15,10 @@ import {
 } from "../null/NullCommandArgumentsInput.ts";
 
 export interface ConfigEntryRow {
-  comment: string;
   defaults: string;
+  description: string;
   key: string;
-  value: string;
+  value: unknown;
 }
 
 export class ListConfigEntriesCommand
@@ -49,24 +50,25 @@ export class ListConfigEntriesCommand
     }
 
     const headers: ConfigEntryRow = {
-      comment: "COMMENT",
       defaults: "DEFAULT",
+      description: "COMMENT",
       key: "ENTRY",
       value: "VALUE",
     };
 
     const table = new Table({
       headers,
-      orders: ["key", "value", "defaults", "comment"],
+      orders: ["key", "value", "defaults", "description"],
       showHeaders: true,
     });
-    const entries = [...configRegistry.entries.values()];
-    entries.sort((a, b) => a.key.localeCompare(b.key));
-    for (const entry of entries) {
-      const { comment, defaults, key } = entry;
+    const entries = [...configRegistry.entries.entries()];
+    entries.sort((a, b) => a[0].localeCompare(b[0]));
+    for (const [key, layout] of entries) {
+      const { description } = layout;
+      const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
       const row: ConfigEntryRow = {
-        comment: comment ?? "",
-        defaults: defaults ?? "",
+        defaults: (defaults ?? "").toString(),
+        description: description ?? "",
         key,
         value: config.get(key),
       };

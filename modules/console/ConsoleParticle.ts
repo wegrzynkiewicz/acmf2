@@ -3,7 +3,6 @@ import { ServiceRegistry } from "../context/ServiceRegistry.ts";
 import { ExitCodeManager } from "../flux/ExitCodeManager.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
-import { AnyConsoleCommand } from "./define/ConsoleCommand.ts";
 import { ConfigCommand } from "./embedded/config/ConfigCommand.ts";
 import { ListConfigEntriesCommand } from "./embedded/config/ListConfigEntriesCommand.ts";
 import { ConsoleCommandExecutor } from "./runtime/ConsoleCommandExecutor.ts";
@@ -11,9 +10,8 @@ import { ConsoleInputParser } from "./runtime/ConsoleInputParser.ts";
 import { StreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
 import { Context } from "../context/Context.ts";
 import { MainCommand } from "./embedded/main/MainCommand.ts";
-import { ConsoleVersionProvider } from "./embedded/version/ConsoleVersionProvider.ts";
-import { VersionCommand } from "./embedded/version/VersionCommand.ts";
 import { HelpCommand } from "./embedded/help/HelpCommand.ts";
+import { ConsoleCommand } from "./define/ConsoleCommand.ts";
 
 export class ConsoleParticle implements Particle {
   public async initServices(
@@ -31,22 +29,18 @@ export class ConsoleParticle implements Particle {
     });
     const config = await serviceRegistry.fetchByCreator(Config);
 
-    const consoleVersionProvider = new ConsoleVersionProvider({ config });
-
     serviceRegistry.registerServices({
       commander,
       consoleCommandExecutor,
       consoleInputParser,
-      consoleVersionProvider,
     });
   }
 
   public async initCommands(
     { commander }: {
-      commander: AnyConsoleCommand;
+      commander: ConsoleCommand;
     },
   ): Promise<void> {
-    commander.registerCommand(new VersionCommand());
     commander.registerCommand(new HelpCommand());
 
     const configCommand = new ConfigCommand();
@@ -64,7 +58,7 @@ export class ConsoleParticle implements Particle {
       standardStreams,
       startUpArgs,
     }: {
-      commander: AnyConsoleCommand;
+      commander: ConsoleCommand;
       consoleCommandExecutor: ConsoleCommandExecutor;
       exitCodeManager: ExitCodeManager;
       standardStreams: StandardStreams;

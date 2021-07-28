@@ -5,6 +5,7 @@ import { DebuggerParticle } from "../debugger/DebuggerParticle.ts";
 import { FluxParticle } from "../flux/FluxParticle.ts";
 import { UsefulParticle } from "../useful/UsefulParticle.ts";
 import { LogParticle } from "../log/LogParticle.ts";
+import { VersionParticle } from "../version/VersionParticle.ts";
 
 bootstrap({
   particles: [
@@ -14,5 +15,6 @@ bootstrap({
     new FluxParticle(),
     new LogParticle(),
     new UsefulParticle(),
+    new VersionParticle(),
   ],
 });

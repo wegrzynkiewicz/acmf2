@@ -1,18 +1,18 @@
-import { ConfigEntry } from "./ConfigEntry.ts";
+import { Layout } from "../layout/layout.ts";
 
 export class Config {
-  private readonly entries: Map<string, ConfigEntry>;
-  private readonly values = new Map<string, string>();
+  private readonly entries: Map<string, Layout>;
+  private readonly values = new Map<string, unknown>();
 
   public constructor(
     { entries }: {
-      entries: Map<string, ConfigEntry>;
+      entries: Map<string, Layout>;
     },
   ) {
     this.entries = entries;
   }
 
-  public get(configKey: string): string {
+  public get(configKey: string): unknown {
     const configValue = this.values.get(configKey);
     if (configValue === undefined) {
       throw new Error(`Cannot get config key named (${configKey}).`);
@@ -20,7 +20,7 @@ export class Config {
     return configValue;
   }
 
-  public set(configKey: string, configValue: string): void {
+  public set(configKey: string, configValue: unknown): void {
     if (!this.entries.has(configKey)) {
       throw new Error(
         `Cannot set unregistered config key named (${configKey}).`,

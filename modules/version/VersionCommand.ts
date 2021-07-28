@@ -1,15 +1,15 @@
-import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
-import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
-import { ConsoleVersionProvider } from "./ConsoleVersionProvider.ts";
-import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
+import { ConsoleCommand } from "../console/define/ConsoleCommand.ts";
+import { ConsoleOutput } from "../console/define/ConsoleOutput.ts";
 import {
   HelpCommandOptionsInput,
   helpCommandOptionsInputLayout,
-} from "../help/HelpCommandOptionsInput.ts";
+} from "../console/embedded/help/HelpCommandOptionsInput.ts";
 import {
   NullCommandArgumentsInput,
   nullCommandArgumentsInputLayout,
-} from "../null/NullCommandArgumentsInput.ts";
+} from "../console/embedded/null/NullCommandArgumentsInput.ts";
+import { UsagePrinter } from "../console/runtime/UsagePrinter.ts";
+import { VersionProvider } from "./VersionProvider.ts";
 
 export class VersionCommand
   extends ConsoleCommand<NullCommandArgumentsInput, HelpCommandOptionsInput> {
@@ -24,8 +24,8 @@ export class VersionCommand
   }
 
   public async execute(
-    { consoleVersionProvider }: {
-      consoleVersionProvider: ConsoleVersionProvider;
+    { versionProvider }: {
+      versionProvider: VersionProvider;
     },
     { executableName, options, output }: {
       executableName: string;
@@ -39,7 +39,7 @@ export class VersionCommand
       return 0;
     }
 
-    const consoleVersion = await consoleVersionProvider.provide();
+    const consoleVersion = await versionProvider.provideVersionInfo();
     const { version, copyright, intro, revision } = consoleVersion;
     const string =
       `${intro} version ${version} revision ${revision} copyright ${copyright}`;

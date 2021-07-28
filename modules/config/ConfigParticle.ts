@@ -13,29 +13,6 @@ export class ConfigParticle implements Particle {
     serviceRegistry.registerServices({ configRegistry });
   }
 
-  public async initConfig(
-    { configRegistry }: {
-      configRegistry: ConfigRegistry;
-    },
-  ): Promise<void> {
-    configRegistry.registerEntry({
-      comment: "Provides an up-to-date semver compatible version of the app.",
-      defaults: "0.0.0",
-      key: "APP_VERSION",
-      layout: {
-        type: "string",
-      },
-    });
-    configRegistry.registerEntry({
-      comment: "Provides an up-to-date revision number of the app.",
-      defaults: "0000000",
-      key: "APP_REVISION",
-      layout: {
-        type: "string",
-      },
-    });
-  }
-
   public async initServices(
     { serviceRegistry }: {
       serviceRegistry: ServiceRegistry;

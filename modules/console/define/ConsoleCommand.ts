@@ -4,19 +4,17 @@ import { Context } from "../../context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { LayoutObject } from "../../layout/layout.ts";
 
-export type AnyConsoleCommand = ConsoleCommand<object, object>;
-
 export class ConsoleCommand<
-  ArgumentsType extends object,
-  OptionsType extends object,
+  ArgumentsType extends unknown = unknown,
+  OptionsType extends unknown = unknown,
 > implements ExecutableHandler {
   public readonly aliases = new Set<string>();
   public readonly argumentsLayout: LayoutObject<ArgumentsType>;
-  public readonly commands = new Map<string, ConsoleCommand<object, object>>();
+  public readonly commands = new Map<string, ConsoleCommand>();
   public readonly description: string;
   public readonly hidden: boolean;
   public readonly name: string;
-  public readonly optionsLayout: LayoutObject<Required<OptionsType>>;
+  public readonly optionsLayout: LayoutObject<OptionsType>;
 
   public constructor(
     { aliases, argumentsLayout, description, name, hidden, optionsLayout }: {
@@ -39,7 +37,7 @@ export class ConsoleCommand<
     }
   }
 
-  public registerCommand(command: AnyConsoleCommand): void {
+  public registerCommand(command: ConsoleCommand): void {
     const { name } = command;
     debug({
       channel: "CONSOLE",
@@ -50,7 +48,7 @@ export class ConsoleCommand<
     this.commands.set(name, command);
   }
 
-  public getCommandByName(commandName: string): AnyConsoleCommand {
+  public getCommandByName(commandName: string): ConsoleCommand {
     for (const command of this.commands.values()) {
       if (command.name === commandName) {
         return command;

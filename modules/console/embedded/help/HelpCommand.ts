@@ -1,8 +1,5 @@
 import { Context } from "../../../context/Context.ts";
-import {
-  AnyConsoleCommand,
-  ConsoleCommand,
-} from "../../define/ConsoleCommand.ts";
+import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
 import {
@@ -14,8 +11,7 @@ import {
   helpCommandOptionsInputLayout,
 } from "./HelpCommandOptionsInput.ts";
 
-export class HelpCommand
-  extends ConsoleCommand<HelpCommandArgumentsInput, HelpCommandOptionsInput> {
+export class HelpCommand extends ConsoleCommand {
   public constructor() {
     super({
       argumentsLayout: helpCommandArgumentsInputLayout,
@@ -32,7 +28,7 @@ export class HelpCommand
       executableName: string;
       options: HelpCommandOptionsInput;
       output: ConsoleOutput;
-      previousCommand: AnyConsoleCommand;
+      previousCommand: ConsoleCommand;
     },
   ): Promise<number> {
     const usagePrinter = new UsagePrinter({ executableName, output });

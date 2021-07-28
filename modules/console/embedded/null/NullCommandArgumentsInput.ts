@@ -8,5 +8,6 @@ export const nullCommandArgumentsInputLayout: LayoutObject<
   metadata: {
     order: [],
   },
+  properties: {},
   type: "object",
 };

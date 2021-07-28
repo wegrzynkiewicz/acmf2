@@ -9,9 +9,10 @@ function createLogHandlerConfig(
   return {
     properties: {
       enabled: {
+        defaults: true,
         description: `Enabling the logging to standard ${name} stream.`,
         metadata: {
-          configEntryKey: `APP_LOG_${key}_MIN_SEVERITY`,
+          configEntryKey: `APP_LOG_${key}_ENABLED`,
           serialization: {
             type: "binaryChar",
           },
@@ -19,6 +20,7 @@ function createLogHandlerConfig(
         type: "boolean",
       },
       minSeverity: {
+        defaults: 9,
         description: `Minimum severity level for standard ${name} stream.`,
         metadata: {
           configEntryKey: `APP_LOG_${key}_MIN_SEVERITY`,
@@ -48,6 +50,7 @@ export interface LogConfig {
 export const logConfigLayout: LayoutObject<LogConfig> = {
   properties: {
     enabled: {
+      defaults: true,
       description: "Enabling the logging mechanism.",
       metadata: {
         configEntryKey: "APP_LOG_ENABLED",

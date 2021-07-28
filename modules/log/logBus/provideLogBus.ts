@@ -1,24 +1,20 @@
-import { Config } from "../../config/Config.ts";
-import { ServiceRegistry } from "../../context/ServiceRegistry.ts";
 import { StandardStreams } from "../../flux/streams/StandardStreams.ts";
 import { SeverityLogFilter } from "../filters/SeverityLogFilter.ts";
 import { JsonLogFormatter } from "../formatters/JsonLogFormatter.ts";
 import { StreamLogHandler } from "../handlers/StreamLogHandler.ts";
+import { LogConfig, LogHandlerConfig } from "../LogConfig.ts";
 import { LogBus } from "./LogBus.ts";
 
 function provideStreamHandler(
-  { config, key, stream }: {
-    config: Config;
-    key: string;
+  { config, stream }: {
+    config: LogHandlerConfig;
     stream: WritableStream<string>;
   },
 ): StreamLogHandler[] {
-  const enabled = config.get(`APP_LOG_${key}_ENABLED`);
-  if (enabled !== "1") {
+  const { enabled, minSeverity } = config;
+  if (!enabled) {
     return [];
   }
-  const minSeverityEntry = config.get(`APP_LOG_${key}_MIN_SEVERITY`);
-  const minSeverity = parseInt(minSeverityEntry);
   const formatter = new JsonLogFormatter();
   const filter = new SeverityLogFilter({ minSeverity });
   const handler = new StreamLogHandler({ filter, formatter, stream });
@@ -26,19 +22,16 @@ function provideStreamHandler(
 }
 
 export async function provideLogBus(
-  { serviceRegistry }: {
-    serviceRegistry: ServiceRegistry;
+  { logConfig, standardStreams }: {
+    logConfig: LogConfig;
+    standardStreams: StandardStreams;
   },
 ): Promise<LogBus> {
-  const config = await serviceRegistry.fetchByCreator(Config);
-  const standardStreams = await serviceRegistry.fetchByName(
-    "standardStreams",
-  ) as StandardStreams;
   const { stderr, stdout } = standardStreams;
   const logBus = new LogBus({
     handlers: [
-      ...provideStreamHandler({ config, key: "STDERR", stream: stderr }),
-      ...provideStreamHandler({ config, key: "STDOUT", stream: stdout }),
+      ...provideStreamHandler({ config: logConfig.stderr, stream: stderr }),
+      ...provideStreamHandler({ config: logConfig.stdout, stream: stdout }),
     ],
   });
   return logBus;
