@@ -52,7 +52,7 @@ export class ServiceRegistry {
       const race = Promise.race([
         promise,
         timeout(serviceKey),
-      ])
+      ]);
       this.promises.set(serviceKey, promise);
       return race as Promise<T>;
     }

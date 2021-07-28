@@ -55,12 +55,11 @@ export class DenoConfigResolver {
       return defaults;
     }
 
-    if (layout.type === 'array') {
+    if (layout.type === "array") {
       debug({
         channel: "CONFIG",
         kind: "config-resolving",
-        message:
-          `Resolving config entry named (${key}) with empty array.`,
+        message: `Resolving config entry named (${key}) with empty array.`,
       });
       return []; // TODO:
     }
