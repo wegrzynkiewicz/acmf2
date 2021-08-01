@@ -1,6 +1,6 @@
 import { debug } from "../../debugger/debug.ts";
-import { ExecutableHandler } from "../../context/Executable.ts";
-import { Context } from "../../context/Context.ts";
+import { ExecutableHandler } from "../../flux/context/Executable.ts";
+import { Context } from "../../flux/context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { LayoutObject } from "../../layout/layout.ts";
 

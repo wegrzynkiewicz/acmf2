@@ -1,11 +1,11 @@
-import { ServiceRegistry } from "../context/ServiceRegistry.ts";
+import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { DenoArgsProvider } from "./args/DenoArgsProvider.ts";
 import { ExitCodeManager } from "./ExitCodeManager.ts";
 import { Particle } from "./particles/Particle.ts";
 import { DenoSTDStreamsProvider } from "./streams/DenoSTDStreamsProvider.ts";
 
 export class FluxParticle implements Particle {
-  public async initServices(
+  public async bootstrap(
     { serviceRegistry }: {
       serviceRegistry: ServiceRegistry;
     },

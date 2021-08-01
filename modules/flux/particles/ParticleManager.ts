@@ -1,9 +1,10 @@
-import { Context } from "../../context/Context.ts";
+import { Context } from "../context/Context.ts";
 import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
+import { PromiseCollector } from "../../useful/PromiseCollector.ts";
 
 function getPrototypeName(object: unknown): string {
-  if (typeof object === "object" && object) {
+  if (typeof object === "object" && object !== null) {
     const prototype = Object.getPrototypeOf(object) as {
       ["constructor"]: { name: string };
     };
@@ -13,8 +14,9 @@ function getPrototypeName(object: unknown): string {
 }
 
 export class ParticleManager {
-  private readonly particles = new Set<Particle>();
   private readonly globalContext: Context;
+  private readonly particles = new Set<Particle>();
+  private readonly promiseCollector = new PromiseCollector();
 
   public constructor(
     { globalContext }: {
@@ -32,14 +34,14 @@ export class ParticleManager {
       message: `Registering particle (${particleName})...`,
     });
     this.particles.add(particle);
-    await this.runSingleParticleStage(particle, "initParticles");
+    await this.runSingleParticleStage(particle, "bootstrap");
   }
 
   public async run<K extends keyof Particle>(stageName: K): Promise<void> {
-    const promises = [...this.particles.values()].map(async (particle) => {
-      await this.runSingleParticleStage(particle, stageName);
-    });
-    await Promise.all(promises);
+    for (const particle of this.particles.values()) {
+      void this.runSingleParticleStage(particle, stageName);
+    }
+    await this.promiseCollector.waitForAll();
   }
 
   private async runSingleParticleStage<K extends keyof Particle>(
@@ -56,7 +58,9 @@ export class ParticleManager {
       const method = particle[stageName] as ((
         globalContext: Context,
       ) => Promise<void>);
-      await method.call(particle, this.globalContext);
+      const promise = method.call(particle, this.globalContext);
+      this.promiseCollector.add(promise);
+      await promise;
     }
   }
 }

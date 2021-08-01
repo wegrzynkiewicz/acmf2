@@ -1,5 +1,5 @@
 import { debug } from "../../debugger/debug.ts";
-import { Context, createContext } from "../../context/Context.ts";
+import { Context, createContext } from "../../flux/context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 import { ConsoleInputParser } from "./ConsoleInputParser.ts";

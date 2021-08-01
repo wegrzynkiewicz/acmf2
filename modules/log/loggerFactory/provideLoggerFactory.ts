@@ -1,4 +1,4 @@
-import { Context } from "../../context/Context.ts";
+import { Context } from "../../flux/context/Context.ts";
 import { LogConfig } from "../LogConfig.ts";
 import { BasicLogger } from "../loggers/BasicLogger.ts";
 import { NullLogger } from "../loggers/NullLogger.ts";

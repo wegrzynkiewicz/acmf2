@@ -1,6 +1,6 @@
-import { debug } from "../debugger/debug.ts";
-import { Deferred, deferred } from "../deps.ts";
-import { lowerCaseFirstLetter } from "../useful/lowerCaseFirstLetter.ts";
+import { debug } from "../../debugger/debug.ts";
+import { Deferred, deferred } from "../../deps.ts";
+import { lowerCaseFirstLetter } from "../../useful/lowerCaseFirstLetter.ts";
 import { Context } from "./Context.ts";
 
 export type ServiceConstructor<T> = new (...args: any[]) => T;

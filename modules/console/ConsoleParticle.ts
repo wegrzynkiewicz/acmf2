@@ -1,5 +1,5 @@
 import { Config } from "../config/Config.ts";
-import { ServiceRegistry } from "../context/ServiceRegistry.ts";
+import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { ExitCodeManager } from "../flux/ExitCodeManager.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
@@ -8,7 +8,7 @@ import { ListConfigEntriesCommand } from "./embedded/config/ListConfigEntriesCom
 import { ConsoleCommandExecutor } from "./runtime/ConsoleCommandExecutor.ts";
 import { ConsoleInputParser } from "./runtime/ConsoleInputParser.ts";
 import { StreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
-import { Context } from "../context/Context.ts";
+import { Context } from "../flux/context/Context.ts";
 import { MainCommand } from "./embedded/main/MainCommand.ts";
 import { HelpCommand } from "./embedded/help/HelpCommand.ts";
 import { ConsoleCommand } from "./define/ConsoleCommand.ts";

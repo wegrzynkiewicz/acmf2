@@ -1,10 +1,20 @@
 import { debug } from "../debugger/debug.ts";
-import { Layout, LayoutObject, LayoutRecord } from "../layout/layout.ts";
+import { Layout, LayoutObject } from "../layout/layout.ts";
 
 export class ConfigRegistry {
+  public readonly layouts = new Map<string, LayoutObject<unknown>>();
   public readonly entries = new Map<string, Layout>();
 
-  public registerEntriesFromLayout(layout: Layout): void {
+  public registerConfigFromLayouts(
+    layouts: Record<string, LayoutObject<unknown>>,
+  ): void {
+    for (const [name, layout] of Object.entries(layouts)) {
+      this.excludeEntry(layout);
+      this.layouts.set(name, layout);
+    }
+  }
+
+  private excludeEntry(layout: Layout) {
     switch (layout.type) {
       case "array":
       case "boolean":
@@ -13,7 +23,7 @@ export class ConfigRegistry {
       case "float":
       case "integer":
       case "string":
-        this.excludeEntry(layout);
+        this.excludeBasicEntry(layout);
         break;
       case "object":
         this.excludeEntryFromObject(layout);
@@ -42,7 +52,7 @@ export class ConfigRegistry {
     this.entries.set(key, layout);
   }
 
-  private excludeEntry(layout: Layout): void {
+  private excludeBasicEntry(layout: Layout): void {
     const metadata = layout.metadata ?? {};
     const key = metadata.configEntryKey;
     if (key === undefined) {
@@ -56,13 +66,13 @@ export class ConfigRegistry {
 
   private excludeEntryFromObject(layout: LayoutObject<unknown>): void {
     try {
-      this.excludeEntry(layout);
+      this.excludeBasicEntry(layout);
     } catch (error: unknown) {
       // nothing
     }
     for (const propertyLayout of Object.values(layout.properties)) {
       try {
-        this.registerEntriesFromLayout(propertyLayout);
+        this.excludeEntry(propertyLayout);
       } catch (error: unknown) {
         // nothing
       }

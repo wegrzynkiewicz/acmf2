@@ -2,15 +2,13 @@ import { debug } from "../debugger/debug.ts";
 import { isPrimitiveLayout } from "../layout/helpers/isPrimitiveLayout.ts";
 import { Layout } from "../layout/layout.ts";
 import { Config } from "./Config.ts";
-import { ConfigRegistry } from "./ConfigRegistry.ts";
 
 export class DenoConfigResolver {
   public async resolve(
-    { configRegistry }: {
-      configRegistry: ConfigRegistry;
+    { entries }: {
+      entries: Map<string, Layout>;
     },
   ): Promise<Config> {
-    const { entries } = configRegistry;
     const config = new Config({ entries });
     for (const [key, layout] of entries.entries()) {
       const value = this.resolveEntry({ key, layout });

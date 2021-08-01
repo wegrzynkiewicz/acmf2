@@ -1,6 +1,6 @@
 import { ConfigRegistry } from "../config/ConfigRegistry.ts";
-import { Context } from "../context/Context.ts";
-import { ServiceRegistry } from "../context/ServiceRegistry.ts";
+import { Context } from "../flux/context/Context.ts";
+import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
 import { provideLogBus } from "./logBus/provideLogBus.ts";
@@ -8,12 +8,13 @@ import { LogConfig, logConfigLayout } from "./LogConfig.ts";
 import { provideLoggerFactory } from "./loggerFactory/provideLoggerFactory.ts";
 
 export class LogParticle implements Particle {
+
   public async initConfig(
     { configRegistry }: {
       configRegistry: ConfigRegistry;
     },
   ): Promise<void> {
-    configRegistry.registerEntriesFromLayout(logConfigLayout);
+    configRegistry.registerConfigFromLayouts({ logConfig: logConfigLayout });
   }
 
   public async initServices(

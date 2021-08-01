@@ -1,4 +1,4 @@
-import { Context } from "../../context/Context.ts";
+import { Context } from "../../flux/context/Context.ts";
 import { Logger } from "../loggers/Logger.ts";
 
 export interface LoggerConstructor {

@@ -1,4 +1,4 @@
-import { Context } from "../../../context/Context.ts";
+import { Context } from "../../../flux/context/Context.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
