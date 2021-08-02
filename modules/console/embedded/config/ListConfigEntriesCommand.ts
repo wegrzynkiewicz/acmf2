@@ -1,4 +1,5 @@
 import { Config } from "../../../config/Config.ts";
+import { ConfigFactory } from "../../../config/ConfigFactory.ts";
 import { ConfigRegistry } from "../../../config/ConfigRegistry.ts";
 import { isPrimitiveLayout } from "../../../layout/helpers/isPrimitiveLayout.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
@@ -33,8 +34,8 @@ export class ListConfigEntriesCommand
   }
 
   public async execute(
-    { config, configRegistry }: {
-      config: Config;
+    { configFactory, configRegistry }: {
+      configFactory: ConfigFactory;
       configRegistry: ConfigRegistry;
     },
     { executableName, options, output }: {
@@ -56,6 +57,7 @@ export class ListConfigEntriesCommand
       value: "VALUE",
     };
 
+    const config = await configFactory.createConfig();
     const table = new Table({
       headers,
       orders: ["key", "value", "defaults", "description"],

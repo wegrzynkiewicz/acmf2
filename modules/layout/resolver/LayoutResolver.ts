@@ -1,5 +1,6 @@
 import { LayoutDataError } from "../common/LayoutDataError.ts";
 import { LayoutInvalidError } from "../common/LayoutInvalidError.ts";
+import { LayoutValidatorResult } from "../common/LayoutValidatorResult.ts";
 import {
   Layout,
   LayoutBoolean,
@@ -15,12 +16,40 @@ export class LayoutContext {
 }
 
 export class LayoutResolver {
-  public async resolve<T>(
+  public assert(
     { data, layout }: {
       data: unknown;
       layout: Layout;
     },
-  ): Promise<T> {
+  ): void {
+    this.resolve({ data, layout });
+  }
+
+  public validate(
+    { data, layout }: {
+      data: unknown;
+      layout: Layout;
+    },
+  ): LayoutValidatorResult {
+    let errors: Error[] = [];
+    let valid: boolean = true;
+    try {
+      this.resolve({ data, layout });
+    } catch (error: unknown) {
+      valid = false;
+      if (error instanceof Error) {
+        errors.push(error);
+      }
+    }
+    return { errors, valid };
+  }
+
+  public resolve<T>(
+    { data, layout }: {
+      data: unknown;
+      layout: Layout;
+    },
+  ): T {
     const context = new LayoutContext();
     const value = this.resolveLayout({ context, data, layout });
     return value as T;
@@ -179,7 +208,7 @@ export class LayoutResolver {
     const object = data as Record<string, unknown>;
     const requiredProperties = layout.required ?? {};
     for (const [propertyName, property] of Object.entries(layout.properties)) {
-      const required = requiredProperties[propertyName] ?? false;
+      const required = requiredProperties[propertyName] ?? true;
       const propertyLayout = property;
       const propertyValue = this.resolveObjectProperty({
         context,

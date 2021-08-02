@@ -8,9 +8,6 @@ export interface AggregateCommandArgumentsInput {
 export const aggregateCommandArgumentsInputLayout: LayoutObject<
   AggregateCommandArgumentsInput
 > = {
-  metadata: {
-    order: ["command", "arguments"],
-  },
   properties: {
     command: {
       defaults: "",
@@ -24,6 +21,10 @@ export const aggregateCommandArgumentsInputLayout: LayoutObject<
       },
       type: "array",
     },
+  },
+  required: {
+    arguments: false,
+    command: false,
   },
   type: "object",
 };

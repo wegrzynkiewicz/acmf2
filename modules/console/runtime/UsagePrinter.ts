@@ -73,7 +73,7 @@ export class UsagePrinter {
     if (args.length > 0) {
       const requiredProperties = argumentsLayout.required ?? {};
       for (const [name, layout] of args) {
-        const required = requiredProperties[name] ?? false;
+        const required = requiredProperties[name] ?? true;
         const commandArgumentLabel = this.getCommandArgumentLabel({
           name,
           layout,
@@ -129,7 +129,7 @@ export class UsagePrinter {
     const properties = Object.entries(command.argumentsLayout.properties);
     const requiredProperties = command.argumentsLayout.required ?? {};
     for (const [name, layout] of properties) {
-      const required = requiredProperties[name] ?? false;
+      const required = requiredProperties[name] ?? true;
       const label = this.getCommandArgumentLabel({ layout, name, required });
       const argumentData: UsageInfo = {
         header: `  ${label}`,
@@ -142,10 +142,10 @@ export class UsagePrinter {
 
   public getCommandOptions(command: ConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
-    const properties = Object.entries(command.optionsLayout);
+    const properties = Object.entries(command.optionsLayout.properties);
     const requiredProperties = command.optionsLayout.required ?? {};
     for (const [name, layout] of properties) {
-      const required = requiredProperties[name] ?? false;
+      const required = requiredProperties[name] ?? true;
       const label = this.getCommandOptionLabel({ name, layout, required });
       const optionRow: UsageInfo = {
         header: `  ${label}`,

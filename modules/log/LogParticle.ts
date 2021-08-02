@@ -1,36 +1,34 @@
-import { ConfigRegistry } from "../config/ConfigRegistry.ts";
+import { LayoutConfigExtractor } from "../config/LayoutConfigExtractor.ts";
 import { Context } from "../flux/context/Context.ts";
 import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
 import { provideLogBus } from "./logBus/provideLogBus.ts";
-import { LogConfig, logConfigLayout } from "./LogConfig.ts";
+import { logConfigLayout } from "./LogConfig.ts";
 import { provideLoggerFactory } from "./loggerFactory/provideLoggerFactory.ts";
 
 export class LogParticle implements Particle {
-
-  public async initConfig(
-    { configRegistry }: {
-      configRegistry: ConfigRegistry;
-    },
-  ): Promise<void> {
-    configRegistry.registerConfigFromLayouts({ logConfig: logConfigLayout });
-  }
-
   public async initServices(
-    { globalContext, serviceRegistry }: {
-      globalContext: Context;
+    { serviceRegistry }: {
       serviceRegistry: ServiceRegistry;
     },
   ): Promise<void> {
-    const [logConfig, standardStreams] = await Promise.all([
-      serviceRegistry.fetchByName<LogConfig>("logConfig"),
+    const [
+      globalContext,
+      layoutConfigExtractor,
+      standardStreams,
+    ] = await Promise.all([
+      serviceRegistry.fetchByName<Context>("globalContext"),
+      serviceRegistry.fetchByCreator(LayoutConfigExtractor),
       serviceRegistry.fetchByName<StandardStreams>("standardStreams"),
     ]);
+    const logConfig = await layoutConfigExtractor.extractConfig(
+      logConfigLayout,
+    );
     const [logBus, loggerFactory] = await Promise.all([
       provideLogBus({ logConfig, standardStreams }),
       provideLoggerFactory({ logConfig, globalContext }),
     ]);
-    serviceRegistry.registerServices({ logBus, loggerFactory });
+    serviceRegistry.registerServices({ logBus, logConfig, loggerFactory });
   }
 }

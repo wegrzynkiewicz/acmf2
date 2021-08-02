@@ -5,7 +5,7 @@ import { Particle } from "./particles/Particle.ts";
 import { DenoSTDStreamsProvider } from "./streams/DenoSTDStreamsProvider.ts";
 
 export class FluxParticle implements Particle {
-  public async bootstrap(
+  public async initServices(
     { serviceRegistry }: {
       serviceRegistry: ServiceRegistry;
     },

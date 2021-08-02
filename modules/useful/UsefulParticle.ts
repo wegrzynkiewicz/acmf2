@@ -1,4 +1,4 @@
-import { ServiceRegistry } from "../context/ServiceRegistry.ts";
+import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { CurrentDateProvider } from "./CurrentDateProvider.ts";
 

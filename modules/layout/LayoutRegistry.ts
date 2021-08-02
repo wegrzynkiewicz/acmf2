@@ -1,6 +1,6 @@
 import { Layout } from "./layout.ts";
 
-export class LayoutRegister {
+export class LayoutRegistry {
   private readonly layouts = new Map<string, Layout>();
 
   public registerLayout(layout: Layout): void {

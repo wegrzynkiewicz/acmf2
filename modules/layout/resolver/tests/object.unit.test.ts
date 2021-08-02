@@ -1,11 +1,11 @@
-import { assertEquals } from "../../deps.ts";
-import { LayoutObject } from "../layout.ts";
-import { LayoutValidator } from "./LayoutValidator.ts";
+import { assertEquals } from "../../../deps.ts";
+import { LayoutObject } from "../../layout.ts";
+import { LayoutResolver } from "../LayoutResolver.ts";
 
-const layoutValidator = new LayoutValidator();
+const layoutResolver = new LayoutResolver();
 
-Deno.test("LayoutValidator validate empty with object layout", () => {
-  const result = layoutValidator.validate({
+Deno.test("LayoutResolver validate empty with object layout", () => {
+  const result = layoutResolver.validate({
     data: {},
     layout: {
       type: "object",
@@ -29,44 +29,44 @@ const exampleSingleFieldPointLayout: LayoutObject<ExampleSingleFieldPoint> = {
   },
 };
 
-Deno.test("LayoutValidator validate object.number", () => {
+Deno.test("LayoutResolver validate object.number", () => {
   const data = {
     x: 1,
   };
-  const result = layoutValidator.validate({
+  const result = layoutResolver.validate({
     data,
     layout: exampleSingleFieldPointLayout,
   });
   assertEquals(result.valid, true);
 });
 
-Deno.test("LayoutValidator validate object.string", () => {
+Deno.test("LayoutResolver validate object.string", () => {
   const data = {
     x: "1",
   };
-  const result = layoutValidator.validate({
+  const result = layoutResolver.validate({
     data,
     layout: exampleSingleFieldPointLayout,
   });
   assertEquals(result.valid, false);
 });
 
-Deno.test("LayoutValidator validate object.null with object layout", () => {
+Deno.test("LayoutResolver validate object.null with object layout", () => {
   const data = {
     x: null,
   };
-  const result = layoutValidator.validate({
+  const result = layoutResolver.validate({
     data,
     layout: exampleSingleFieldPointLayout,
   });
   assertEquals(result.valid, false);
 });
 
-Deno.test("LayoutValidator validate object.undefined object layout", () => {
+Deno.test("LayoutResolver validate object.undefined object layout", () => {
   const data = {
     x: undefined,
   };
-  const result = layoutValidator.validate({
+  const result = layoutResolver.validate({
     data,
     layout: exampleSingleFieldPointLayout,
   });

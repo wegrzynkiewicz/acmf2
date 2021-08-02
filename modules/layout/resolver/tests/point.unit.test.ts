@@ -1,19 +1,8 @@
-import { assertEquals } from "../../deps.ts";
-import { LayoutObject } from "../layout.ts";
-import { LayoutResolver } from "./LayoutResolver.ts";
+import { assertEquals } from "../../../deps.ts";
+import { LayoutObject } from "../../layout.ts";
+import { LayoutResolver } from "../LayoutResolver.ts";
 
 const layoutResolver = new LayoutResolver();
-
-Deno.test("LayoutResolver validate empty with object layout", async () => {
-  const result = await layoutResolver.resolve({
-    data: {},
-    layout: {
-      properties: {},
-      type: "object",
-    },
-  });
-  assertEquals(result, {});
-});
 
 interface ExamplePoint {
   x: number;

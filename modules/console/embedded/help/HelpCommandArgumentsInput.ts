@@ -9,10 +9,13 @@ export const helpCommandArgumentsInputLayout: LayoutObject<
 > = {
   properties: {
     command: {
-      defaults: "help",
+      defaults: "",
       description: "The command whose help information will displayed.",
       type: "string",
     },
+  },
+  required: {
+    command: false,
   },
   type: "object",
 };

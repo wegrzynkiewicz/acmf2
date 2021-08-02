@@ -32,7 +32,7 @@ export class HelpCommand extends ConsoleCommand {
     },
   ): Promise<number> {
     const usagePrinter = new UsagePrinter({ executableName, output });
-    if (options.help === true) {
+    if (options.help === true || args.command === "") {
       usagePrinter.writeHelp(this);
       return 0;
     }

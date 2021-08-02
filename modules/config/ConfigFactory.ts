@@ -1,12 +1,24 @@
-import { LayoutObject } from "../layout/layout.ts";
 import { Config } from "./Config.ts";
+import { ConfigRegistry } from "./ConfigRegistry.ts";
+import { ConfigResolver } from "./ConfigResolver.ts";
 
 export class ConfigFactory {
-  public resolve(
-    { config, layout }: {
-      config: Config;
-      layout: LayoutObject<unknown>;
+  private readonly configRegistry: ConfigRegistry;
+  private readonly configResolver: ConfigResolver;
+
+  public constructor(
+    { configRegistry, configResolver }: {
+      configRegistry: ConfigRegistry;
+      configResolver: ConfigResolver;
     },
-  ): unknown {
+  ) {
+    this.configRegistry = configRegistry;
+    this.configResolver = configResolver;
+  }
+
+  public async createConfig(): Promise<Config> {
+    const { configRegistry, configResolver } = this;
+    const config = await configResolver.resolve({ configRegistry });
+    return config;
   }
 }

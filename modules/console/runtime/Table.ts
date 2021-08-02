@@ -64,12 +64,19 @@ export class Table<T> {
     const maxLengths = this.calculateMaxWidth();
     for (const row of this.getRows()) {
       for (const key of this.orders) {
-        const value = row[key] as unknown as string;
+        const value = this.formatData(row[key]);
         const maxLength = maxLengths[key];
         buffer += value.padEnd(maxLength + 3, " ");
       }
       buffer += "\n";
     }
     return buffer;
+  }
+
+  public formatData(data: unknown): string {
+    if (Array.isArray(data)) {
+      return JSON.stringify(data);
+    }
+    return String(data);
   }
 }

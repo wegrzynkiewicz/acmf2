@@ -153,13 +153,11 @@ export class ConsoleInputParser {
     },
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    const { metadata, properties, required } = command.argumentsLayout;
+    const { properties, required } = command.argumentsLayout;
     const requiredProperties = required ?? {};
-    const order = (metadata?.order ?? []) as string[];
     const argsList = [...args];
 
-    for (const name of order) {
-      const property = properties[name];
+    for (const [name, propertyLayout] of Object.entries(properties)) {
       const isRequired = requiredProperties[name] ?? true;
 
       if (isRequired && argsList.length === 0) {
@@ -171,7 +169,7 @@ export class ConsoleInputParser {
         });
       }
 
-      if (property.type === "array") {
+      if (propertyLayout.type === "array") {
         const values = argsList.splice(0);
         result[name] = values.length === 0 ? [] : values;
         continue;
@@ -179,9 +177,11 @@ export class ConsoleInputParser {
 
       const value = argsList.shift();
       if (
-        value === undefined && isPrimitiveLayout(property) && property.defaults
+        value === undefined &&
+        isPrimitiveLayout(propertyLayout) &&
+        propertyLayout.defaults !== undefined
       ) {
-        result[name] = property.defaults;
+        result[name] = propertyLayout.defaults;
         continue;
       }
 

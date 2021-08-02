@@ -1,15 +1,12 @@
-import { Layout } from "../layout/layout.ts";
-
 export class Config {
-  private readonly entries: Map<string, Layout>;
-  private readonly values = new Map<string, unknown>();
+  private readonly values: Map<string, unknown>;
 
   public constructor(
-    { entries }: {
-      entries: Map<string, Layout>;
+    { values }: {
+      values: Map<string, unknown>;
     },
   ) {
-    this.entries = entries;
+    this.values = values;
   }
 
   public get(configKey: string): unknown {
@@ -18,19 +15,5 @@ export class Config {
       throw new Error(`Cannot get config key named (${configKey}).`);
     }
     return configValue;
-  }
-
-  public set(configKey: string, configValue: unknown): void {
-    if (!this.entries.has(configKey)) {
-      throw new Error(
-        `Cannot set unregistered config key named (${configKey}).`,
-      );
-    }
-    if (this.values.has(configKey)) {
-      throw new Error(
-        `Cannot set already set up config key named (${configKey}).`,
-      );
-    }
-    this.values.set(configKey, configValue);
   }
 }

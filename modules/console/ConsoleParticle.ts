@@ -1,4 +1,3 @@
-import { Config } from "../config/Config.ts";
 import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { ExitCodeManager } from "../flux/ExitCodeManager.ts";
 import { Particle } from "../flux/particles/Particle.ts";
@@ -15,38 +14,30 @@ import { ConsoleCommand } from "./define/ConsoleCommand.ts";
 
 export class ConsoleParticle implements Particle {
   public async initServices(
-    { globalContext, serviceRegistry }: {
-      globalContext: Context;
+    { serviceRegistry }: {
       serviceRegistry: ServiceRegistry;
     },
   ): Promise<void> {
+    const [globalContext] = await Promise.all([
+      serviceRegistry.fetchByName<Context>("globalContext"),
+    ]);
     const commander = new MainCommand();
-
     const consoleInputParser = new ConsoleInputParser();
     const consoleCommandExecutor = new ConsoleCommandExecutor({
       consoleInputParser,
       globalContext,
     });
-    const config = await serviceRegistry.fetchByCreator(Config);
 
     serviceRegistry.registerServices({
       commander,
       consoleCommandExecutor,
       consoleInputParser,
     });
-  }
 
-  public async initCommands(
-    { commander }: {
-      commander: ConsoleCommand;
-    },
-  ): Promise<void> {
     commander.registerCommand(new HelpCommand());
-
     const configCommand = new ConfigCommand();
     configCommand.registerCommand(new HelpCommand());
     configCommand.registerCommand(new ListConfigEntriesCommand());
-
     commander.registerCommand(configCommand);
   }
 
