@@ -47,7 +47,7 @@ export class MainCommand extends ConsoleCommand<
       output = new NullConsoleOutput();
     }
 
-    if (args.command === undefined) {
+    if (args.command === undefined || args.command === "") {
       usagePrinter.writeHelp(this);
       output.writeLine(
         `Type \`${executableName} help [command]\` for more information on specific commands.\n`,
