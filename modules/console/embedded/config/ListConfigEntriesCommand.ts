@@ -1,19 +1,12 @@
-import { Config } from "../../../config/Config.ts";
-import { ConfigFactory } from "../../../config/ConfigFactory.ts";
+import { ConfigGetter } from "../../../config/ConfigGetter.ts";
 import { ConfigRegistry } from "../../../config/ConfigRegistry.ts";
-import { isPrimitiveLayout } from "../../../layout/helpers/isPrimitiveLayout.ts";
+import { GlobalService } from "../../../flux/context/GlobalService.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { Table } from "../../runtime/Table.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import {
-  HelpCommandOptionsInput,
-  helpCommandOptionsInputLayout,
-} from "../help/HelpCommandOptionsInput.ts";
-import {
-  NullCommandArgumentsInput,
-  nullCommandArgumentsInputLayout,
-} from "../null/NullCommandArgumentsInput.ts";
+import { HelpOptions, helpOptionsLayout } from "../help/HelpCommand.ts";
+import { NullArgs, nullArgsLayout } from "../null/NullArgs.ts";
 
 export interface ConfigEntryRow {
   defaults: string;
@@ -23,24 +16,25 @@ export interface ConfigEntryRow {
 }
 
 export class ListConfigEntriesCommand
-  extends ConsoleCommand<NullCommandArgumentsInput, HelpCommandOptionsInput> {
+  extends ConsoleCommand<NullArgs, HelpOptions> {
   public constructor() {
     super({
-      argumentsLayout: nullCommandArgumentsInputLayout,
+      args: nullArgsLayout,
       description: "Display all registered config entries.",
       name: "list",
-      optionsLayout: helpCommandOptionsInputLayout,
+      options: helpOptionsLayout,
     });
   }
 
   public async execute(
-    { configFactory, configRegistry }: {
-      configFactory: ConfigFactory;
+    { configGetter, configRegistry, globalContext }: {
+      configGetter: ConfigGetter;
       configRegistry: ConfigRegistry;
+      globalContext: unknown;
     },
     { executableName, options, output }: {
       executableName: string;
-      options: HelpCommandOptionsInput;
+      options: HelpOptions;
       output: ConsoleOutput;
     },
   ): Promise<number> {
@@ -57,7 +51,6 @@ export class ListConfigEntriesCommand
       value: "VALUE",
     };
 
-    const config = await configFactory.createConfig();
     const table = new Table({
       headers,
       orders: ["key", "value", "defaults", "description"],
@@ -65,14 +58,13 @@ export class ListConfigEntriesCommand
     });
     const entries = [...configRegistry.entries.entries()];
     entries.sort((a, b) => a[0].localeCompare(b[0]));
-    for (const [key, layout] of entries) {
-      const { description } = layout;
-      const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
+    for (const [key, variable] of entries) {
+      const { description, defaults } = variable.layout;
       const row: ConfigEntryRow = {
         defaults: (defaults ?? "").toString(),
         description: description ?? "",
         key,
-        value: config.get(key),
+        value: configGetter.get(key),
       };
       table.addRow(row);
     }
@@ -83,3 +75,9 @@ export class ListConfigEntriesCommand
     return 0;
   }
 }
+
+export const listConfigEntriesCommandService: GlobalService = {
+  globalDeps: [],
+  key: "listConfigEntriesCommand",
+  provider: async () => new ListConfigEntriesCommand(),
+};

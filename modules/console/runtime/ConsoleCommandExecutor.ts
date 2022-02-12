@@ -1,48 +1,46 @@
 import { debug } from "../../debugger/debug.ts";
-import { Context, createContext } from "../../flux/context/Context.ts";
+import { Context, createScopedContext } from "../../flux/context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 import { ConsoleInputParser } from "./ConsoleInputParser.ts";
-import { ConsoleCommand } from "../define/ConsoleCommand.ts";
+import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
+import { GlobalService } from "../../flux/context/GlobalService.ts";
 
-export class ConsoleCommandExecutor {
-  private readonly globalContext: Context;
-  private readonly consoleInputParser: ConsoleInputParser;
+export interface ConsoleCommandExecutorOptions {
+  args: string[];
+  command: UnknownConsoleCommand;
+  currentCommand: UnknownConsoleCommand;
+  executableName: string;
+  output: ConsoleOutput;
+}
 
-  public constructor(
-    { globalContext, consoleInputParser }: {
-      globalContext: Context;
-      consoleInputParser: ConsoleInputParser;
-    },
-  ) {
-    this.consoleInputParser = consoleInputParser;
-    this.globalContext = globalContext;
-  }
+export interface ConsoleCommandExecutor {
+  executeCommand(options: ConsoleCommandExecutorOptions): Promise<number>;
+}
 
-  public async executeCommand(
-    { args, command, currentCommand, executableName, output }: {
-      args: string[];
-      command: ConsoleCommand;
-      currentCommand: ConsoleCommand;
-      executableName: string;
-      output: ConsoleOutput;
-    },
-  ): Promise<number> {
+export async function provideConsoleCommandExecutor(
+  { globalContext, consoleInputParser }: {
+    globalContext: Context;
+    consoleInputParser: ConsoleInputParser;
+  },
+): Promise<ConsoleCommandExecutor> {
+  const executeCommand = async (
+    { args, command, currentCommand, executableName, output }:
+      ConsoleCommandExecutorOptions,
+  ): Promise<number> => {
     const argsString = args.join(" ");
     debug({
       channel: "CONSOLE",
       kind: "console-command-executing",
       message: `Executing command (${command.name}) with (${argsString})...`,
     });
-    const { globalContext, consoleInputParser } = this;
-
     let localContext: Context;
     try {
       const { argsInput, optionsInput } = consoleInputParser.parse({
         args,
         command,
       });
-      localContext = createContext({ name: "localContext" });
+      localContext = createScopedContext();
       localContext["args"] = argsInput;
       localContext["command"] = command;
       localContext["executableName"] = executableName;
@@ -77,5 +75,12 @@ export class ConsoleCommandExecutor {
         status: 1,
       });
     }
-  }
+  };
+  return { executeCommand };
 }
+
+export const consoleCommandExecutorService: GlobalService = {
+  globalDeps: ["globalContext", "consoleInputParser"],
+  key: "consoleCommandExecutor",
+  provider: provideConsoleCommandExecutor,
+};

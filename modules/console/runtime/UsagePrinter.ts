@@ -1,6 +1,7 @@
 import { isPrimitiveLayout } from "../../layout/helpers/isPrimitiveLayout.ts";
 import { Layout } from "../../layout/layout.ts";
-import { ConsoleCommand } from "../define/ConsoleCommand.ts";
+import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
+import { LayoutUnknownConsoleOption } from "../define/ConsoleOption.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 
 export interface UsageInfo {
@@ -22,7 +23,7 @@ export class UsagePrinter {
     this.output = output;
   }
 
-  public writeHelp(command: ConsoleCommand): void {
+  public writeHelp(command: UnknownConsoleCommand): void {
     this.writeCommandUsage(command);
     this.writeCommandDescription(command);
     this.writeCommandAliases(command);
@@ -59,20 +60,20 @@ export class UsagePrinter {
     }
   }
 
-  public writeCommandUsage(command: ConsoleCommand): void {
-    const { argumentsLayout, hidden, name, optionsLayout } = command;
+  public writeCommandUsage(command: UnknownConsoleCommand): void {
+    const { args, hidden, name, options } = command;
     this.output.write("Usage:");
     this.output.write(` ${this.executableName}`);
     if (name !== "" && !hidden) {
       this.output.write(` ${name}`);
     }
-    if (Object.keys(optionsLayout.properties).length > 0) {
+    if (Object.keys(options.properties).length > 0) {
       this.output.write(" [options]");
     }
-    const args = Object.entries(argumentsLayout.properties);
-    if (args.length > 0) {
-      const requiredProperties = argumentsLayout.required ?? {};
-      for (const [name, layout] of args) {
+    const argsEntries = Object.entries(args.properties);
+    if (argsEntries.length > 0) {
+      const requiredProperties = args.required ?? {};
+      for (const [name, layout] of argsEntries) {
         const required = requiredProperties[name] ?? true;
         const commandArgumentLabel = this.getCommandArgumentLabel({
           name,
@@ -86,7 +87,7 @@ export class UsagePrinter {
     this.output.writeLine("");
   }
 
-  public writeCommandDescription(command: ConsoleCommand): void {
+  public writeCommandDescription(command: UnknownConsoleCommand): void {
     const { description } = command;
     if (description) {
       this.output.writeLine(description);
@@ -94,7 +95,7 @@ export class UsagePrinter {
     }
   }
 
-  public writeCommandAliases(command: ConsoleCommand): void {
+  public writeCommandAliases(command: UnknownConsoleCommand): void {
     const { aliases } = command;
     if (aliases.size > 0) {
       this.output.writeLine("Aliases:");
@@ -124,10 +125,10 @@ export class UsagePrinter {
     return label;
   }
 
-  public getCommandArguments(command: ConsoleCommand): UsageInfo[] {
+  public getCommandArguments(command: UnknownConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
-    const properties = Object.entries(command.argumentsLayout.properties);
-    const requiredProperties = command.argumentsLayout.required ?? {};
+    const properties = Object.entries(command.args.properties);
+    const requiredProperties = command.args.required ?? {};
     for (const [name, layout] of properties) {
       const required = requiredProperties[name] ?? true;
       const label = this.getCommandArgumentLabel({ layout, name, required });
@@ -140,10 +141,10 @@ export class UsagePrinter {
     return table;
   }
 
-  public getCommandOptions(command: ConsoleCommand): UsageInfo[] {
+  public getCommandOptions(command: UnknownConsoleCommand): UsageInfo[] {
     const table: UsageInfo[] = [];
-    const properties = Object.entries(command.optionsLayout.properties);
-    const requiredProperties = command.optionsLayout.required ?? {};
+    const properties = Object.entries(command.options.properties);
+    const requiredProperties = command.options.required ?? {};
     for (const [name, layout] of properties) {
       const required = requiredProperties[name] ?? true;
       const label = this.getCommandOptionLabel({ name, layout, required });
@@ -159,12 +160,11 @@ export class UsagePrinter {
   public getCommandOptionLabel(
     { name, layout, required }: {
       name: string;
-      layout: Layout;
+      layout: LayoutUnknownConsoleOption;
       required: boolean;
     },
   ): string {
-    const { longFlags, shortFlags } = layout.metadata ?? {};
-
+    const { longFlags, shortFlags } = layout ?? {};
     const flags: string[] = [];
     if (Array.isArray(shortFlags) && shortFlags.length > 0) {
       for (const shortFlag of shortFlags) {
@@ -200,7 +200,7 @@ export class UsagePrinter {
     return label;
   }
 
-  public getSubCommands(command: ConsoleCommand): UsageInfo[] {
+  public getSubCommands(command: UnknownConsoleCommand): UsageInfo[] {
     const list: UsageInfo[] = [];
     for (const child of command.commands.values()) {
       if (!child.hidden) {
@@ -210,7 +210,7 @@ export class UsagePrinter {
     return list;
   }
 
-  public getAvailableCommandDescription(command: ConsoleCommand): UsageInfo {
+  public getAvailableCommandDescription(command: UnknownConsoleCommand): UsageInfo {
     const { name, description } = command;
     let header = `  ${name}`;
     const usageTable: UsageInfo = {

@@ -1,60 +1,69 @@
-import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
-import { ConfigCommand } from "./embedded/config/ConfigCommand.ts";
-import { ListConfigEntriesCommand } from "./embedded/config/ListConfigEntriesCommand.ts";
+import {
+  ConfigCommand,
+  configCommandService,
+} from "./embedded/config/ConfigCommand.ts";
+import {
+  ListConfigEntriesCommand,
+  listConfigEntriesCommandService,
+} from "./embedded/config/ListConfigEntriesCommand.ts";
 import {
   ConsoleCommandExecutor,
-  consoleCommandExecutorKey,
+  consoleCommandExecutorService,
 } from "./runtime/ConsoleCommandExecutor.ts";
-import {
-  ConsoleInputParser,
-  consoleInputParserKey,
-} from "./runtime/ConsoleInputParser.ts";
+import { consoleInputParserService } from "./runtime/ConsoleInputParser.ts";
 import { StreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
-import { commanderService, MainCommand, mainCommandKey } from "./embedded/main/MainCommand.ts";
-import { HelpCommand } from "./embedded/help/HelpCommand.ts";
-import { ConsoleCommand } from "./define/ConsoleCommand.ts";
+import {
+  MainCommand,
+  mainCommandService,
+} from "./embedded/main/MainCommand.ts";
+import {
+  HelpCommand,
+  helpCommandService,
+} from "./embedded/help/HelpCommand.ts";
 import { GlobalServiceRegistry } from "../flux/context/GlobalServiceRegistry.ts";
 
 export const consoleParticle: Particle = {
+  async assignConsoleCommands(
+    { configCommand, helpCommand, listConfigEntriesCommand, mainCommand }: {
+      configCommand: ConfigCommand;
+      helpCommand: HelpCommand;
+      listConfigEntriesCommand: ListConfigEntriesCommand;
+      mainCommand: MainCommand;
+    },
+  ): Promise<void> {
+    mainCommand.registerCommand(helpCommand);
+    {
+      configCommand.registerCommand(helpCommand);
+      configCommand.registerCommand(listConfigEntriesCommand);
+      mainCommand.registerCommand(configCommand);
+    }
+  },
   async initGlobalServices(
     { globalServiceRegistry }: {
       globalServiceRegistry: GlobalServiceRegistry;
     },
   ): Promise<void> {
     await Promise.all([
-      globalServiceRegistry.registerService(commanderService),
+      globalServiceRegistry.registerService(mainCommandService),
+      globalServiceRegistry.registerService(consoleInputParserService),
+      globalServiceRegistry.registerService(consoleCommandExecutorService),
+      globalServiceRegistry.registerService(helpCommandService),
+      globalServiceRegistry.registerService(configCommandService),
+      globalServiceRegistry.registerService(listConfigEntriesCommandService),
     ]);
-    const mainCommand = new MainCommand();
-    const consoleInputParser = new ConsoleInputParser();
-    const consoleCommandExecutor = new ConsoleCommandExecutor({
-      consoleInputParser,
-      globalContext,
-    });
+  },
 
-    serviceRegistry.registerServices({
-      [mainCommandKey]: mainCommand,
-      [consoleCommandExecutorKey]: consoleCommandExecutor,
-      [consoleInputParserKey]: consoleInputParser,
-    });
-
-    mainCommand.registerCommand(new HelpCommand());
-    const configCommand = new ConfigCommand();
-    configCommand.registerCommand(new HelpCommand());
-    configCommand.registerCommand(new ListConfigEntriesCommand());
-    mainCommand.registerCommand(configCommand);
-  }
-
-  public async execute(
+  async execute(
     {
-      commander,
       consoleCommandExecutor,
+      mainCommand,
       standardStreams,
       startUpArgs,
     }: {
-      commander: ConsoleCommand;
       consoleCommandExecutor: ConsoleCommandExecutor;
+      mainCommand: MainCommand;
       standardStreams: StandardStreams;
       startUpArgs: string[];
     },
@@ -63,11 +72,11 @@ export const consoleParticle: Particle = {
     const output = new StreamConsoleOutput({ stderr, stdout });
     const exitCode = await consoleCommandExecutor.executeCommand({
       args: [...startUpArgs],
-      currentCommand: commander,
-      command: commander,
+      currentCommand: mainCommand,
+      command: mainCommand,
       executableName: "./console",
       output,
     });
     // TODO: return exit code
-  }
-}
+  },
+};

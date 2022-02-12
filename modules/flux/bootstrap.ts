@@ -36,5 +36,6 @@ export async function bootstrap(
   }
   await particleManager.run("initConfigVariables");
   await particleManager.run("initGlobalServices");
+  await particleManager.run("assignConsoleCommands");
   await particleManager.run("execute");
 }

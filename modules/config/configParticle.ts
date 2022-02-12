@@ -12,7 +12,7 @@ export const configParticle: Particle = {
   ): Promise<void> {
     await Promise.all([
       globalServiceRegistry.registerService(configGetterService),
-      globalServiceRegistry.registerService(configRegistryService),
+      // globalServiceRegistry.registerService(configRegistryService),
       globalServiceRegistry.registerService(configResolverService),
     ]);
   },

@@ -1,5 +1,6 @@
 import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
-import { ConsoleCommand, ConsoleOptions } from "../../define/ConsoleCommand.ts";
+import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
+import { LayoutConsoleOptions } from "../../define/ConsoleOption.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { ConsoleCommandExecutor } from "../../runtime/ConsoleCommandExecutor.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
@@ -36,7 +37,7 @@ export class AggregateCommand<TOptions extends { help: boolean }>
     { description, name, options }: {
       description?: string;
       name: string;
-      options: ConsoleOptions<TOptions>;
+      options: LayoutConsoleOptions<TOptions>;
     },
   ) {
     super({

@@ -1,12 +1,13 @@
 import { debug } from "../../debugger/debug.ts";
 import { ArgParsingOptions, parse } from "../../deps.ts";
 import { Breaker } from "../../flux/Breaker.ts";
+import { GlobalService } from "../../flux/context/GlobalService.ts";
 import { isPrimitiveLayout } from "../../layout/helpers/isPrimitiveLayout.ts";
-import { ConsoleCommand } from "../define/ConsoleCommand.ts";
+import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
 
-function getBooleanOptions(command: ConsoleCommand): string[] {
+function getBooleanOptions(command: UnknownConsoleCommand): string[] {
   const options: string[] = [];
-  const properties = Object.entries(command.optionsLayout.properties);
+  const properties = Object.entries(command.options.properties);
   for (const [name, option] of properties) {
     if (option.type === "boolean") {
       options.push(name);
@@ -15,9 +16,9 @@ function getBooleanOptions(command: ConsoleCommand): string[] {
   return options;
 }
 
-function getStringOptions(command: ConsoleCommand): string[] {
+function getStringOptions(command: UnknownConsoleCommand): string[] {
   const options: string[] = [];
-  const properties = Object.entries(command.optionsLayout.properties);
+  const properties = Object.entries(command.options.properties);
   for (const [name, option] of properties) {
     if (option.type !== "boolean") {
       options.push(name);
@@ -27,10 +28,10 @@ function getStringOptions(command: ConsoleCommand): string[] {
 }
 
 function getDefaultOptions(
-  command: ConsoleCommand,
+  command: UnknownConsoleCommand,
 ): Record<string, unknown> {
   const defaults: Record<string, unknown> = {};
-  const properties = Object.entries(command.optionsLayout.properties);
+  const properties = Object.entries(command.options.properties);
   for (const [name, option] of properties) {
     if (isPrimitiveLayout(option)) {
       defaults[name] = option.defaults;
@@ -39,17 +40,17 @@ function getDefaultOptions(
   return defaults;
 }
 
-function getAliasOptions(command: ConsoleCommand): Record<string, string> {
+function getAliasOptions(
+  command: UnknownConsoleCommand,
+): Record<string, string> {
   const aliases: Record<string, string> = {};
-  const properties = Object.entries(command.optionsLayout.properties);
+  const properties = Object.entries(command.options.properties);
   for (const [name, option] of properties) {
-    const metadata = option.metadata ?? {};
-    const longFlags = (metadata.longFlag ?? []) as string[];
-    const shortFlags = (metadata.shortFlags ?? []) as string[];
-    for (const longFlag of longFlags) {
+    const { longFlags, shortFlags } = option;
+    for (const longFlag of longFlags ?? []) {
       aliases[longFlag] = name;
     }
-    for (const shortFlag of shortFlags) {
+    for (const shortFlag of shortFlags ?? []) {
       aliases[shortFlag] = name;
     }
   }
@@ -76,7 +77,7 @@ export class ConsoleInputParser {
   public parse(
     { args, command }: {
       args: string[];
-      command: ConsoleCommand;
+      command: UnknownConsoleCommand;
     },
   ): ParsedInput {
     const parsed = this.parseFromCLI({
@@ -101,7 +102,7 @@ export class ConsoleInputParser {
   public parseFromCLI(
     { args, command }: {
       args: string[];
-      command: ConsoleCommand;
+      command: UnknownConsoleCommand;
     },
   ): ParsedFromCLI {
     const options: ArgParsingOptions = {
@@ -149,11 +150,11 @@ export class ConsoleInputParser {
   public extractArguments(
     { args, command }: {
       args: ArgumentType[];
-      command: ConsoleCommand;
+      command: UnknownConsoleCommand;
     },
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    const { properties, required } = command.argumentsLayout;
+    const { properties, required } = command.args;
     const requiredProperties = required ?? {};
     const argsList = [...args];
 
@@ -202,12 +203,12 @@ export class ConsoleInputParser {
 
   public extractOptions(
     { command, options }: {
-      command: ConsoleCommand;
+      command: UnknownConsoleCommand;
       options: OptionsType;
     },
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    const { properties, required } = command.optionsLayout;
+    const { properties, required } = command.options;
     const requiredProperties = required ?? {};
     for (const [name, propertyLayout] of Object.entries(properties)) {
       const value = options[name];
@@ -246,3 +247,9 @@ export class ConsoleInputParser {
     return result;
   }
 }
+
+export const consoleInputParserService: GlobalService = {
+  globalDeps: [],
+  key: "consoleInputParser",
+  provider: async () => new ConsoleInputParser(),
+};

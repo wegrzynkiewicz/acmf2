@@ -4,6 +4,9 @@ import { GlobalServiceRegistry } from "../context/GlobalServiceRegistry.ts";
 import { ParticleRegistry } from "./ParticleRegistry.ts";
 
 export interface Particle {
+  assignConsoleCommands?: (
+    globalContext: GlobalContext,
+  ) => Promise<void>;
   initConfigVariables?: (
     { configRegistry }: {
       configRegistry: ConfigRegistry;

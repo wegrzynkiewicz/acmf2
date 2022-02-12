@@ -79,8 +79,8 @@ export class MainCommand extends ConsoleCommand<AggregateArgs, MainOptions> {
   }
 }
 
-export const commanderService: GlobalService = {
+export const mainCommandService: GlobalService = {
   globalDeps: [],
-  key: "commander",
+  key: "mainCommand",
   provider: async () => new MainCommand(),
 };

@@ -1,4 +1,5 @@
 import { Context } from "../../../flux/context/Context.ts";
+import { GlobalService } from "../../../flux/context/GlobalService.ts";
 import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
 import {
   ConsoleCommand,
@@ -78,3 +79,9 @@ export class HelpCommand extends ConsoleCommand<HelpArgs, HelpOptions> {
     return 0;
   }
 }
+
+export const helpCommandService: GlobalService = {
+  globalDeps: [],
+  key: "helpCommand",
+  provider: async () => new HelpCommand(),
+};

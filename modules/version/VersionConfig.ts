@@ -8,7 +8,7 @@ export interface VersionConfig {
 }
 
 export const appRevisionVariable: ConfigVariable = {
-  key: "APP_REVISION",
+  key: "REVISION",
   layout: {
     defaults: "0000000",
     description: "Provides an up-to-date revision number of the app.",
@@ -17,7 +17,7 @@ export const appRevisionVariable: ConfigVariable = {
 };
 
 export const appVersionVariable: ConfigVariable = {
-  key: "APP_VERSION",
+  key: "VERSION",
   layout: {
     defaults: "0.0.0",
     description: "Provides an up-to-date semver compatible version of the app.",
