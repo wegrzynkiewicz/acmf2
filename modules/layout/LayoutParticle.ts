@@ -4,9 +4,9 @@ import { LayoutRegistry } from "./LayoutRegistry.ts";
 import { LayoutResolver } from "./resolver/LayoutResolver.ts";
 
 export class LayoutParticle implements Particle {
-  public async initServices(
+  public async initGlobalServices(
     { serviceRegistry }: {
-      serviceRegistry: ServiceRegistry;
+      serviceRegistry: ServiceRegistry<GlobalContext>;
     },
   ): Promise<void> {
     const layoutRegistry = new LayoutRegistry();

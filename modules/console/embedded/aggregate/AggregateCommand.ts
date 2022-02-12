@@ -1,28 +1,49 @@
-import { LayoutObject } from "../../../layout/layout.ts";
-import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
+import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
+import { ConsoleCommand, ConsoleOptions } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { ConsoleCommandExecutor } from "../../runtime/ConsoleCommandExecutor.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import {
-  AggregateCommandArgumentsInput,
-  aggregateCommandArgumentsInputLayout,
-} from "./AggregateCommandArgumentsInput.ts";
 
-export class AggregateCommand<
-  OptionsType extends { help: boolean },
-> extends ConsoleCommand {
+export interface AggregateArgs {
+  args?: string[];
+  command?: string;
+}
+
+export const aggregateArgsLayout: LayoutConsoleArguments<AggregateArgs> = {
+  properties: {
+    command: {
+      description: "The command to execute.",
+      type: "string",
+    },
+    args: {
+      description: "The arguments to pass to command.",
+      items: {
+        type: "string",
+      },
+      type: "array",
+    },
+  },
+  required: {
+    command: false,
+    args: false,
+  },
+  type: "object",
+};
+
+export class AggregateCommand<TOptions extends { help: boolean }>
+  extends ConsoleCommand<AggregateArgs, TOptions> {
   public constructor(
-    { description, name, optionsLayout }: {
+    { description, name, options }: {
       description?: string;
       name: string;
-      optionsLayout: LayoutObject<OptionsType>;
+      options: ConsoleOptions<TOptions>;
     },
   ) {
     super({
-      argumentsLayout: aggregateCommandArgumentsInputLayout,
+      args: aggregateArgsLayout,
       description,
       name,
-      optionsLayout,
+      options,
     });
   }
 
@@ -31,13 +52,13 @@ export class AggregateCommand<
       consoleCommandExecutor: ConsoleCommandExecutor;
     },
     { args, executableName, options, output }: {
-      args: AggregateCommandArgumentsInput;
+      args: AggregateArgs;
       executableName: string;
-      options: OptionsType;
+      options: TOptions;
       output: ConsoleOutput;
     },
   ): Promise<number> {
-    const { arguments: argsList, command: commandName } = args;
+    const { args: argsList, command: commandName } = args;
 
     if (options && options.help === true) {
       const usagePrinter = new UsagePrinter({ executableName, output });

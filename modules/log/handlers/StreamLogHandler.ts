@@ -1,30 +1,28 @@
-import { LogFilter } from "../filters/LogFilter.ts";
-import { LogFormatter } from "../formatters/LogFormatter.ts";
+import { SeverityLogFilter } from "../filters/SeverityLogFilter.ts";
+import { JsonLogFormatter } from "../formatters/JsonLogFormatter.ts";
 import { Log } from "../Log.ts";
+import { LogHandlerConfig } from "../LogConfig.ts";
 import { LogHandler } from "./LogHandler.ts";
 
-export class StreamLogHandler implements LogHandler {
-  private readonly filter: LogFilter;
-  private readonly formatter: LogFormatter;
-  private readonly stream: WritableStream<string>;
-
-  public constructor(
-    { filter, formatter, stream }: {
-      filter: LogFilter;
-      formatter: LogFormatter;
-      stream: WritableStream<string>;
-    },
-  ) {
-    this.filter = filter;
-    this.formatter = formatter;
-    this.stream = stream;
+export function provideStreamHandler(
+  { config, stream }: {
+    config: LogHandlerConfig;
+    stream: WritableStream<string>;
+  },
+): LogHandler[] {
+  const { enabled, minSeverity } = config;
+  if (enabled === false) {
+    return [];
   }
-
-  public handle(log: Log): void {
-    if (this.filter.filtrate(log)) {
-      const formattedLog = this.formatter.format(log);
-      const writer = this.stream.getWriter();
+  const formatter = new JsonLogFormatter();
+  const filter = new SeverityLogFilter({ minSeverity });
+  const handle = (log: Log): void => {
+    if (filter.filtrate(log)) {
+      const formattedLog = formatter.format(log);
+      const writer = stream.getWriter();
       writer.write(formattedLog);
     }
-  }
+  };
+  const logHandler = { handle };
+  return [logHandler];
 }

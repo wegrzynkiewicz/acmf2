@@ -1,30 +1,40 @@
-import { createContext } from "./context/Context.ts";
-import { ServiceRegistry } from "./context/ServiceRegistry.ts";
+import { configRegistryService } from "../config/ConfigRegistry.ts";
+import { createGlobalContext } from "./context/Context.ts";
+import { GlobalServiceRegistry } from "./context/GlobalServiceRegistry.ts";
 import { Particle } from "./particles/Particle.ts";
-import { ParticleManager } from "./particles/ParticleManager.ts";
-import { ParticleRegistry } from "./particles/ParticleRegistry.ts";
+import {
+  ParticleManager,
+  particleManagerService,
+} from "./particles/ParticleManager.ts";
+import {
+  ParticleRegistry,
+  particleRegistryService,
+} from "./particles/ParticleRegistry.ts";
 
 export async function bootstrap(
   { particles }: {
     particles: Particle[];
   },
 ): Promise<void> {
-  const globalContext = createContext({ name: "globalContext" });
-  const serviceRegistry = new ServiceRegistry({ context: globalContext });
-  const particleRegistry = new ParticleRegistry();
-  const particleManager = new ParticleManager({
-    globalContext,
-    particleRegistry,
+  const globalContext = createGlobalContext();
+  const serviceRegistry = new GlobalServiceRegistry({ context: globalContext });
+  await serviceRegistry.registerService({
+    globalDeps: [],
+    key: "globalServiceRegistry",
+    provider: async () => serviceRegistry,
   });
-  serviceRegistry.registerServices({
-    particleManager,
-    particleRegistry,
-    serviceRegistry,
-  });
+  const particleRegistry = await serviceRegistry.registerService<
+    ParticleRegistry
+  >(particleRegistryService);
+  const particleManager = await serviceRegistry.registerService<
+    ParticleManager
+  >(particleManagerService);
+  await serviceRegistry.registerService(configRegistryService);
 
   for (const particle of particles) {
     await particleRegistry.registerParticle(particle);
   }
-  await particleManager.run("initServices");
+  await particleManager.run("initConfigVariables");
+  await particleManager.run("initGlobalServices");
   await particleManager.run("execute");
 }

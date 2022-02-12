@@ -19,7 +19,15 @@ export class VersionCommand
       aliases: ["show-version"],
       description: "Show the current version of console application.",
       name: "version",
-      optionsLayout: helpCommandOptionsInputLayout,
+      options: [
+        new CommandOption({
+          defaults: false,
+          description: "Show the help information about this command.",
+          longFlags: ["help"],
+          shortFlags: ["h"],
+          type: "boolean",
+        }),
+      ],
     });
   }
 

@@ -1,8 +1,7 @@
-import { CurrentDateProvider } from "../../useful/CurrentDateProvider.ts";
+import { CurrentDateProvider } from "../../date/CurrentDateProvider.ts";
 import { Log } from "../Log.ts";
 import { LogBus } from "../logBus/LogBus.ts";
-import { Logger } from "./Logger.ts";
-import { LoggerInput } from "./LoggerInput.ts";
+import { Logger, LoggerInput } from "./Logger.ts";
 
 export class BasicLogger implements Logger {
   public readonly currentDateProvider: CurrentDateProvider;

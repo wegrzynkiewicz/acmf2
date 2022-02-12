@@ -1,43 +1,43 @@
 import { debug } from "../../debugger/debug.ts";
 import { ExecutableHandler } from "../../flux/context/Executable.ts";
-import { Context } from "../../flux/context/Context.ts";
 import { Breaker } from "../../flux/Breaker.ts";
-import { LayoutObject } from "../../layout/layout.ts";
+import { Context, GlobalContext } from "../../flux/context/Context.ts";
+import { LayoutConsoleArguments } from "./ConsoleArgument.ts";
+import { LayoutConsoleOptions } from "./ConsoleOption.ts";
 
-export class ConsoleCommand<
-  ArgumentsType extends unknown = unknown,
-  OptionsType extends unknown = unknown,
-> implements ExecutableHandler {
+export type UnknownConsoleCommand = ConsoleCommand<unknown, unknown>;
+
+export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
   public readonly aliases = new Set<string>();
-  public readonly argumentsLayout: LayoutObject<ArgumentsType>;
-  public readonly commands = new Map<string, ConsoleCommand>();
+  public readonly args: LayoutConsoleArguments<TArgs>;
+  public readonly commands = new Map<string, UnknownConsoleCommand>();
   public readonly description: string;
   public readonly hidden: boolean;
   public readonly name: string;
-  public readonly optionsLayout: LayoutObject<OptionsType>;
+  public readonly options: LayoutConsoleOptions<TOptions>;
 
   public constructor(
-    { aliases, argumentsLayout, description, name, hidden, optionsLayout }: {
+    { aliases, args, description, name, hidden, options }: {
       aliases?: string[];
-      argumentsLayout: LayoutObject<ArgumentsType>;
+      args: LayoutConsoleArguments<TArgs>;
       description?: string;
       name: string;
       hidden?: boolean;
-      optionsLayout: LayoutObject<OptionsType>;
+      options: LayoutConsoleOptions<TOptions>;
     },
   ) {
     this.description = description ?? "";
     this.hidden = hidden ?? false;
     this.name = name;
-    this.argumentsLayout = argumentsLayout;
-    this.optionsLayout = optionsLayout;
+    this.args = args;
+    this.options = options;
 
     for (const alias of aliases ?? []) {
       this.aliases.add(alias);
     }
   }
 
-  public registerCommand(command: ConsoleCommand): void {
+  public registerCommand(command: UnknownConsoleCommand): void {
     const { name } = command;
     debug({
       channel: "CONSOLE",
@@ -48,7 +48,7 @@ export class ConsoleCommand<
     this.commands.set(name, command);
   }
 
-  public getCommandByName(commandName: string): ConsoleCommand {
+  public getCommandByName(commandName: string): UnknownConsoleCommand {
     for (const command of this.commands.values()) {
       if (command.name === commandName) {
         return command;
@@ -66,7 +66,7 @@ export class ConsoleCommand<
   }
 
   public execute(
-    _globalContext: Context,
+    _globalContext: GlobalContext,
     _localContext?: Context,
     _options?: Context,
   ): Promise<number> {

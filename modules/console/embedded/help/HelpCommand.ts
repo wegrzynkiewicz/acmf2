@@ -1,34 +1,71 @@
 import { Context } from "../../../flux/context/Context.ts";
-import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
+import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
+import {
+  ConsoleCommand,
+  UnknownConsoleCommand,
+} from "../../define/ConsoleCommand.ts";
+import {
+  LayoutBooleanConsoleOption,
+  LayoutConsoleOptions,
+} from "../../define/ConsoleOption.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import {
-  HelpCommandArgumentsInput,
-  helpCommandArgumentsInputLayout,
-} from "./HelpCommandArgumentsInput.ts";
-import {
-  HelpCommandOptionsInput,
-  helpCommandOptionsInputLayout,
-} from "./HelpCommandOptionsInput.ts";
 
-export class HelpCommand extends ConsoleCommand {
+export interface HelpArgs {
+  command: string;
+}
+
+export const helpArgsLayout: LayoutConsoleArguments<HelpArgs> = {
+  properties: {
+    command: {
+      defaults: "",
+      description: "The command whose help information will displayed.",
+      type: "string",
+    },
+  },
+  required: {
+    command: false,
+  },
+  type: "object",
+};
+
+export interface HelpOptions {
+  help: boolean;
+}
+
+export const helpOptionLayout: LayoutBooleanConsoleOption = {
+  defaults: false,
+  description: "Show the help information about this command.",
+  longFlags: ["help"],
+  shortFlags: ["h"],
+  type: "boolean",
+};
+
+export const helpOptionsLayout: LayoutConsoleOptions<HelpOptions> = {
+  properties: {
+    help: helpOptionLayout,
+  },
+  type: "object",
+};
+
+export class HelpCommand extends ConsoleCommand<HelpArgs, HelpOptions> {
   public constructor() {
     super({
-      argumentsLayout: helpCommandArgumentsInputLayout,
+      args: helpArgsLayout,
       description: "Show the help information about selected command.",
       name: "help",
-      optionsLayout: helpCommandOptionsInputLayout,
+      options: helpOptionsLayout,
     });
   }
 
   public async execute(
     globalContext: Context,
     { args, executableName, options, output, previousCommand }: {
-      args: HelpCommandArgumentsInput;
+      args: HelpArgs;
       executableName: string;
-      options: HelpCommandOptionsInput;
+      options: HelpOptions;
       output: ConsoleOutput;
-      previousCommand: ConsoleCommand;
+      previousCommand: UnknownConsoleCommand;
     },
   ): Promise<number> {
     const usagePrinter = new UsagePrinter({ executableName, output });

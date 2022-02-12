@@ -1,23 +1,26 @@
 import { debug } from "../debugger/debug.ts";
-import { Layout } from "../layout/layout.ts";
+import { GlobalService } from "../flux/context/GlobalService.ts";
+import { ConfigVariable } from "./ConfigVariable.ts";
 
 export class ConfigRegistry {
-  public readonly entries = new Map<string, Layout>();
+  public readonly entries = new Map<string, ConfigVariable>();
 
-  public registerEntry(
-    { key, layout }: {
-      key: string;
-      layout: Layout;
-    },
-  ): void {
+  public registerEntry(variable: ConfigVariable): void {
+    const { key } = variable;
     if (this.entries.has(key)) {
-      throw new Error(`Configuration entry named (${key}) already exists.`);
+      throw new Error(`Configuration variable named (${key}) already exists.`);
     }
     debug({
       channel: "CONFIG",
-      kind: "config-entry-registering",
+      kind: "config-variable-registering",
       message: `Registering config key (${key}).`,
     });
-    this.entries.set(key, layout);
+    this.entries.set(key, variable);
   }
 }
+
+export const configRegistryService: GlobalService = {
+  globalDeps: [],
+  key: "configRegistry",
+  provider: async () => new ConfigRegistry(),
+};

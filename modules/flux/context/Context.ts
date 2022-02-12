@@ -1,19 +1,22 @@
-export type Context = Record<string, unknown>;
+export type Key = string | symbol;
+export type Context = any;
+export type GlobalContext = Context;
+export type ScopedContext = Context;
 
-export type ServiceGetter<T extends unknown = unknown> = (
-  serviceKey: string,
-) => T;
-
-export function createContext(
-  { name }: {
-    name: string;
-  },
-): Context {
-  const context: Context = {};
-  const get: ServiceGetter = (serviceKey) => {
+export function createGlobalContext(): GlobalContext {
+  const context: GlobalContext = {};
+  context.globalContext = context;
+  context.get = (serviceKey: Key) => {
     return context[serviceKey];
   };
-  context["get"] = get;
-  context[name] = context;
+  return context;
+}
+
+export function createScopedContext(): ScopedContext {
+  const context: ScopedContext = {};
+  context.scopedContext = context;
+  context.get = (serviceKey: Key) => {
+    return context[serviceKey];
+  };
   return context;
 }

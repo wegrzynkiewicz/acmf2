@@ -1,32 +1,27 @@
-import { Context } from "../context/Context.ts";
 import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
 import { ParticleRegistry } from "./ParticleRegistry.ts";
 import { getPrototypeName } from "../../common/getPrototypeName.ts";
+import { GlobalService } from "../context/GlobalService.ts";
+import { GlobalContext } from "../context/Context.ts";
 
-export class ParticleManager {
-  private readonly globalContext: Context;
-  private readonly particleRegistry: ParticleRegistry;
+export interface ParticleManager {
+  run<K extends keyof Particle>(stageName: K): Promise<void>;
+}
 
-  public constructor(
-    { globalContext, particleRegistry }: {
-      globalContext: Context;
-      particleRegistry: ParticleRegistry;
-    },
-  ) {
-    this.globalContext = globalContext;
-    this.particleRegistry = particleRegistry;
-  }
+export const particleManagerService: GlobalService = {
+  globalDeps: ["globalContext", "particleRegistry"],
+  key: "particleManager",
+  provider: provideParticleManager,
+};
 
-  public async run<K extends keyof Particle>(stageName: K): Promise<void> {
-    const particles = [...this.particleRegistry.particles.values()];
-    const promises = particles.map(async (particle) => {
-      await this.runSingleParticleStage(particle, stageName);
-    });
-    await Promise.all(promises);
-  }
-
-  private async runSingleParticleStage<K extends keyof Particle>(
+export async function provideParticleManager(
+  { globalContext, particleRegistry }: {
+    globalContext: GlobalContext;
+    particleRegistry: ParticleRegistry;
+  },
+): Promise<ParticleManager> {
+  async function runSingleParticleStage<K extends keyof Particle>(
     particle: Particle,
     stageName: K,
   ): Promise<void> {
@@ -38,9 +33,19 @@ export class ParticleManager {
         message: `Particle executing (${particleName}.${stageName})...`,
       });
       const method = particle[stageName] as ((
-        globalContext: Context,
+        globalContext: GlobalContext,
       ) => Promise<void>);
-      await method.call(particle, this.globalContext);
+      await method.call(particle, globalContext);
     }
   }
+
+  async function run<K extends keyof Particle>(stageName: K): Promise<void> {
+    const particles = [...particleRegistry.particles.values()];
+    const promises = particles.map(async (particle) => {
+      await runSingleParticleStage(particle, stageName);
+    });
+    await Promise.all(promises);
+  }
+
+  return { run };
 }

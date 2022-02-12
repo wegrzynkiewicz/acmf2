@@ -1,50 +1,39 @@
-import { Context } from "../../flux/context/Context.ts";
-import { Logger } from "../loggers/Logger.ts";
+import { GlobalContext } from "../../flux/context/Context.ts";
+import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { LogConfig } from "../LogConfig.ts";
+import { BasicLogger } from "../loggers/BasicLogger.ts";
+import { Logger, LoggerParameters } from "../loggers/Logger.ts";
+import { nullLogger } from "../loggers/NullLogger.ts";
 
-export interface LoggerConstructor {
-  new (
-    globalContext: Context,
-    options: {
-      parameters: Context;
-    },
-  ): Logger;
+export interface LoggerFactory {
+  produceLogger(extraParameters: LoggerParameters): Logger;
 }
 
-export class LoggerFactory {
-  private readonly globalContext: Context;
-  private readonly loggerConstructor: LoggerConstructor;
-  private readonly additionalParameters: Context;
-
-  public constructor(
-    { globalContext }: {
-      globalContext: Context;
-    },
-    { loggerConstructor, parameters }: {
-      loggerConstructor: LoggerConstructor;
-      parameters: Context;
-    },
-  ) {
-    this.globalContext = globalContext;
-    this.loggerConstructor = loggerConstructor;
-    this.additionalParameters = parameters;
+export async function provideLoggerFactory(
+  { globalContext, logConfig }: {
+    globalContext: GlobalContext;
+    logConfig: LogConfig;
+  },
+): Promise<LoggerFactory> {
+  if (logConfig.enabled === false) {
+    const produceLogger = () => nullLogger;
+    return { produceLogger };
   }
-
-  public produceLogger(
-    extraParameters: Context,
-  ): Logger {
-    const {
-      globalContext,
-      loggerConstructor,
-      additionalParameters,
-    } = this;
-    const parameters = {
-      ...additionalParameters,
+  const produceLogger = (extraParameters: LoggerParameters): Logger => {
+    const parameters: LoggerParameters = {
       ...extraParameters,
     };
-    const logger = new loggerConstructor(
-      globalContext,
+    const logger = new BasicLogger(
+      globalContext as any,
       { parameters },
     );
     return logger;
-  }
+  };
+  return { produceLogger };
 }
+
+export const loggerFactoryService: GlobalService = {
+  globalDeps: ["globalContext", "logConfig"],
+  key: "loggerFactory",
+  provider: provideLoggerFactory,
+};

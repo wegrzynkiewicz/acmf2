@@ -1,4 +1,11 @@
-import { LoggerInput } from "./LoggerInput.ts";
+export type LoggerParameters = Record<string, unknown>;
+
+export interface LoggerInput {
+  channel: string;
+  kind: string;
+  message: string;
+  parameters?: Record<string, unknown>;
+}
 
 export interface Logger {
   extend: (parameters: Record<string, unknown>) => void;

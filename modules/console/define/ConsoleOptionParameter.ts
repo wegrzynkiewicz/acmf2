@@ -1,4 +1,10 @@
-export class ConsoleOptionParameter {
+export interface ConsoleOptionParameter {
+  defaults?: unknown;
+  name: string;
+  required?: boolean;
+}
+
+export class ConsoleOptionParameterX {
   public readonly defaults: unknown;
   public readonly name: string;
   public readonly required: boolean;

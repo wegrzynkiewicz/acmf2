@@ -1,6 +1,7 @@
 import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
 import { getPrototypeName } from "../../common/getPrototypeName.ts";
+import { GlobalService } from "../context/GlobalService.ts";
 
 export class ParticleRegistry {
   public readonly particles = new Set<Particle>();
@@ -19,3 +20,9 @@ export class ParticleRegistry {
     }
   }
 }
+
+export const particleRegistryService: GlobalService = {
+  globalDeps: [],
+  key: "particleRegistry",
+  provider: async () => new ParticleRegistry(),
+};

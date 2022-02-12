@@ -1,8 +1,38 @@
+import {
+  LayoutBoolean,
+  LayoutNumber,
+  LayoutString,
+} from "../../layout/layout.ts";
 import { ConsoleOptionParameter } from "./ConsoleOptionParameter.ts";
 
-export type ConsoleOptionType = "boolean" | "number" | "string";
+export interface ConsoleFlags {
+  parameter?: ConsoleOptionParameter;
+  longFlags?: string[];
+  shortFlags?: string[];
+}
 
-export class ConsoleOption {
+export type LayoutBooleanConsoleOption = LayoutBoolean & ConsoleFlags;
+export type LayoutStringConsoleOption = LayoutString & ConsoleFlags;
+export type LayoutNumberConsoleOption = LayoutNumber & ConsoleFlags;
+
+type Positive<T> = T extends string ? LayoutStringConsoleOption
+  : T extends boolean ? LayoutBooleanConsoleOption
+  : T extends number ? LayoutNumberConsoleOption
+  : never;
+
+export type LayoutConsoleOption<T> = Positive<Exclude<T, null | undefined>>;
+
+export type LayoutConsoleOptions<T> = {
+  properties: {
+    +readonly [K in keyof T]-?: LayoutConsoleOption<T[K]>;
+  };
+  required?: {
+    +readonly [K in keyof T]-?: boolean;
+  };
+  type: "object";
+};
+
+export class ConsoleOptionX {
   public readonly description: string;
   public readonly longFlags: string[];
   public readonly name: string;

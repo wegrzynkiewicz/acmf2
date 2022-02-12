@@ -1,18 +1,19 @@
-import { Layout } from "../layout/layout.ts";
-import { Config } from "./Config.ts";
+import { GlobalService } from "../flux/context/GlobalService.ts";
+import { ConfigGetter } from "./ConfigGetter.ts";
 import { ConfigRegistry } from "./ConfigRegistry.ts";
+import { DenoConfigResolver } from "./DenoConfigResolver.ts";
 
 export interface ConfigResolver {
-  resolve(
-    { configRegistry }: {
-      configRegistry: ConfigRegistry;
-    },
-  ): Promise<Config>;
-
-  resolveEntry(
-    { key, layout }: {
-      key: string;
-      layout: Layout;
-    },
-  ): Promise<unknown>;
+  resolveConfigGetter(configRegistry: ConfigRegistry): Promise<ConfigGetter>;
 }
+
+export async function provideConfigResolver(): Promise<ConfigResolver> {
+  const configResolver = new DenoConfigResolver();
+  return configResolver;
+}
+
+export const configResolverService: GlobalService = {
+  key: "configResolver",
+  globalDeps: [],
+  provider: provideConfigResolver,
+};

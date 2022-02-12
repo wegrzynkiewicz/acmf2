@@ -1,42 +1,34 @@
 import { debug } from "../debugger/debug.ts";
-import { isPrimitiveLayout } from "../layout/helpers/isPrimitiveLayout.ts";
-import { Layout } from "../layout/layout.ts";
-import { Config } from "./Config.ts";
+import { ConfigGetter } from "./ConfigGetter.ts";
 import { ConfigRegistry } from "./ConfigRegistry.ts";
 import { ConfigResolver } from "./ConfigResolver.ts";
+import { ConfigVariable } from "./ConfigVariable.ts";
 
 export class DenoConfigResolver implements ConfigResolver {
-  public async resolve(
-    { configRegistry }: {
-      configRegistry: ConfigRegistry;
-    },
-  ): Promise<Config> {
-    const values = new Map<string, unknown>();
-    const entries = [...configRegistry.entries.entries()];
-    const promises = entries.map(async (entry) => {
-      const [key, layout] = entry;
-      const value = await this.resolveEntry({ key, layout });
+  public async resolveConfigGetter(
+    configRegistry: ConfigRegistry,
+  ): Promise<ConfigGetter> {
+    const values = new Map<string, string>();
+    for (const variable of configRegistry.entries.values()) {
+      const { key } = variable;
+      const value = this.resolveEntry(variable);
       values.set(key, value);
-    });
-    await Promise.all(promises);
-    const config = new Config({ values });
+    }
+    const config = new ConfigGetter(values);
     return config;
   }
 
-  public async resolveEntry(
-    { key, layout }: {
-      key: string;
-      layout: Layout;
-    },
-  ): Promise<unknown> {
-    const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
-
+  public resolveEntry(variable: ConfigVariable): string {
+    const { key, layout } = variable;
+    const { defaults } = layout;
     let value: string | undefined = undefined;
     try {
       value = Deno.env.get(key);
     } catch (error: unknown) {
       if (defaults === undefined) {
-        throw error;
+        throw new Error(`Cannot resolve config variable named (${key}).`, {
+          cause: error,
+        });
       }
     }
 
@@ -59,15 +51,6 @@ export class DenoConfigResolver implements ConfigResolver {
       return defaults;
     }
 
-    if (layout.type === "array") {
-      debug({
-        channel: "CONFIG",
-        kind: "config-resolving",
-        message: `Resolving config entry named (${key}) with empty array.`,
-      });
-      return []; // TODO:
-    }
-
-    throw new Error(`Cannot resolve config option named (${key}).`);
+    throw new Error(`Cannot resolve config variable named (${key}).`);
   }
 }

@@ -1,28 +1,35 @@
+import { GlobalService } from "../../../flux/context/GlobalService.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { ConsoleCommandExecutor } from "../../runtime/ConsoleCommandExecutor.ts";
 import { NullConsoleOutput } from "../../runtime/NullConsoleOutput.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
 import {
-  AggregateCommandArgumentsInput,
-  aggregateCommandArgumentsInputLayout,
-} from "../aggregate/AggregateCommandArgumentsInput.ts";
-import {
-  MainCommandOptionsInput,
-  mainCommandOptionsInputLayout,
-} from "./MainCommandOptionsInput.ts";
+  AggregateArgs,
+  aggregateArgsLayout,
+} from "../aggregate/AggregateCommand.ts";
+import { helpOptionLayout } from "../help/HelpCommand.ts";
+import { quietOptionLayout } from "../quiet/quietOptionLayout.ts";
 
-export class MainCommand extends ConsoleCommand<
-  AggregateCommandArgumentsInput,
-  MainCommandOptionsInput
-> {
+export interface MainOptions {
+  help: boolean;
+  quiet: boolean;
+}
+
+export class MainCommand extends ConsoleCommand<AggregateArgs, MainOptions> {
   public constructor() {
     super({
-      argumentsLayout: aggregateCommandArgumentsInputLayout,
+      args: aggregateArgsLayout,
       description: "The main build in command which execute of sub command.",
       hidden: true,
       name: "main",
-      optionsLayout: mainCommandOptionsInputLayout,
+      options: {
+        properties: {
+          help: helpOptionLayout,
+          quiet: quietOptionLayout,
+        },
+        type: "object",
+      },
     });
   }
 
@@ -31,9 +38,9 @@ export class MainCommand extends ConsoleCommand<
       consoleCommandExecutor: ConsoleCommandExecutor;
     },
     { args, executableName, options, output }: {
-      args: AggregateCommandArgumentsInput;
+      args: AggregateArgs;
       executableName: string;
-      options: MainCommandOptionsInput;
+      options: MainOptions;
       output: ConsoleOutput;
     },
   ): Promise<number> {
@@ -59,7 +66,7 @@ export class MainCommand extends ConsoleCommand<
       throw new Error(`Cannot direct run a command named (${this.name}).`);
     }
 
-    const argsList = args.arguments ?? [];
+    const argsList = args.args ?? [];
     const command = this.getCommandByName(args.command);
     const exitCode = await consoleCommandExecutor.executeCommand({
       args: argsList,
@@ -71,3 +78,9 @@ export class MainCommand extends ConsoleCommand<
     return exitCode;
   }
 }
+
+export const commanderService: GlobalService = {
+  globalDeps: [],
+  key: "commander",
+  provider: async () => new MainCommand(),
+};

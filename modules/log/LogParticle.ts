@@ -1,34 +1,40 @@
-import { LayoutConfigExtractor } from "../config/LayoutConfigExtractor.ts";
-import { Context } from "../flux/context/Context.ts";
-import { ServiceRegistry } from "../flux/context/ServiceRegistry.ts";
+import { ConfigRegistry } from "../config/ConfigRegistry.ts";
+import { GlobalServiceRegistry } from "../flux/context/GlobalServiceRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
-import { StandardStreams } from "../flux/streams/StandardStreams.ts";
-import { provideLogBus } from "./logBus/provideLogBus.ts";
-import { logConfigLayout } from "./LogConfig.ts";
-import { provideLoggerFactory } from "./loggerFactory/provideLoggerFactory.ts";
+import { logBusService } from "./logBus/LogBus.ts";
+import {
+  enabledConfigVariable,
+  logConfigService,
+  stderrEnabledConfigVariable,
+  stderrMinSeverityConfigVariable,
+  stdoutEnabledConfigVariable,
+  stdoutMinSeverityConfigVariable,
+  tagsConfigVariable,
+} from "./LogConfig.ts";
+import { loggerFactoryService } from "./loggerFactory/LoggerFactory.ts";
 
-export class LogParticle implements Particle {
-  public async initServices(
-    { serviceRegistry }: {
-      serviceRegistry: ServiceRegistry;
+export const logParticle: Particle = {
+  async initConfigVariables(
+    { configRegistry }: {
+      configRegistry: ConfigRegistry;
     },
   ): Promise<void> {
-    const [
-      globalContext,
-      layoutConfigExtractor,
-      standardStreams,
-    ] = await Promise.all([
-      serviceRegistry.fetchByName<Context>("globalContext"),
-      serviceRegistry.fetchByCreator(LayoutConfigExtractor),
-      serviceRegistry.fetchByName<StandardStreams>("standardStreams"),
+    configRegistry.registerEntry(enabledConfigVariable);
+    configRegistry.registerEntry(tagsConfigVariable);
+    configRegistry.registerEntry(stderrEnabledConfigVariable);
+    configRegistry.registerEntry(stderrMinSeverityConfigVariable);
+    configRegistry.registerEntry(stdoutEnabledConfigVariable);
+    configRegistry.registerEntry(stdoutMinSeverityConfigVariable);
+  },
+  async initGlobalServices(
+    { globalServiceRegistry }: {
+      globalServiceRegistry: GlobalServiceRegistry;
+    },
+  ): Promise<void> {
+    await Promise.all([
+      globalServiceRegistry.registerService(logBusService),
+      globalServiceRegistry.registerService(logConfigService),
+      globalServiceRegistry.registerService(loggerFactoryService),
     ]);
-    const logConfig = await layoutConfigExtractor.extractConfig(
-      logConfigLayout,
-    );
-    const [logBus, loggerFactory] = await Promise.all([
-      provideLogBus({ logConfig, standardStreams }),
-      provideLoggerFactory({ logConfig, globalContext }),
-    ]);
-    serviceRegistry.registerServices({ logBus, logConfig, loggerFactory });
-  }
-}
+  },
+};

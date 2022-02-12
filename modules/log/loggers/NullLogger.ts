@@ -1,5 +1,4 @@
-import { Logger } from "./Logger.ts";
-import { LoggerInput } from "./LoggerInput.ts";
+import { Logger, LoggerInput } from "./Logger.ts";
 
 export class NullLogger implements Logger {
   public clone(additionalParameters: Record<string, unknown>): Logger {
@@ -46,3 +45,5 @@ export class NullLogger implements Logger {
     // nothing
   }
 }
+
+export const nullLogger = new NullLogger();
