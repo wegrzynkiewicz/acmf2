@@ -9,7 +9,9 @@ export interface VersionInfo {
   version: string;
 }
 
-export type VersionProvider = () => VersionInfo;
+export interface VersionProvider {
+  provideVersionInfo: () => VersionInfo;
+}
 
 export async function provideVersionProvider(
   { currentDateProvider, versionConfig }: {
@@ -17,7 +19,7 @@ export async function provideVersionProvider(
     versionConfig: VersionConfig;
   },
 ): Promise<VersionProvider> {
-  return (): VersionInfo => {
+  const provideVersionInfo = (): VersionInfo => {
     const currentDate = currentDateProvider.provideCurrentDate();
     const { revision, version } = versionConfig;
     const consoleVersion: VersionInfo = {
@@ -28,6 +30,7 @@ export async function provideVersionProvider(
     };
     return consoleVersion;
   };
+  return { provideVersionInfo };
 }
 
 export const versionProviderService: GlobalService = {

@@ -1,33 +1,19 @@
 import { ConsoleCommand } from "../console/define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../console/define/ConsoleOutput.ts";
-import {
-  HelpCommandOptionsInput,
-  helpCommandOptionsInputLayout,
-} from "../console/embedded/help/HelpCommandOptionsInput.ts";
-import {
-  NullCommandArgumentsInput,
-  nullCommandArgumentsInputLayout,
-} from "../console/embedded/null/NullCommandArgumentsInput.ts";
+import { HelpOptions, helpOptionsLayout } from "../console/embedded/help/HelpCommand.ts";
+import { NullArgs, nullArgsLayout } from "../console/embedded/null/NullArgs.ts";
 import { UsagePrinter } from "../console/runtime/UsagePrinter.ts";
+import { GlobalService } from "../flux/context/GlobalService.ts";
 import { VersionProvider } from "./VersionProvider.ts";
 
-export class VersionCommand
-  extends ConsoleCommand<NullCommandArgumentsInput, HelpCommandOptionsInput> {
+export class VersionCommand extends ConsoleCommand<NullArgs, HelpOptions> {
   public constructor() {
     super({
-      argumentsLayout: nullCommandArgumentsInputLayout,
+      args: nullArgsLayout,
       aliases: ["show-version"],
       description: "Show the current version of console application.",
       name: "version",
-      options: [
-        new CommandOption({
-          defaults: false,
-          description: "Show the help information about this command.",
-          longFlags: ["help"],
-          shortFlags: ["h"],
-          type: "boolean",
-        }),
-      ],
+      options: helpOptionsLayout,
     });
   }
 
@@ -37,7 +23,7 @@ export class VersionCommand
     },
     { executableName, options, output }: {
       executableName: string;
-      options: HelpCommandOptionsInput;
+      options: HelpOptions;
       output: ConsoleOutput;
     },
   ): Promise<number> {
@@ -56,3 +42,9 @@ export class VersionCommand
     return 0;
   }
 }
+
+export const versionCommandService: GlobalService = {
+  globalDeps: [],
+  key: "versionCommand",
+  provider: async () => new VersionCommand(),
+};
