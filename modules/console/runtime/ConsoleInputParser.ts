@@ -58,8 +58,8 @@ function getAliasOptions(
 }
 
 export interface ParsedInput {
-  argsInput: Record<string, unknown>;
-  optionsInput: Record<string, unknown>;
+  args: Record<string, unknown>;
+  options: Record<string, unknown>;
 }
 
 export type ArgumentType = number | string;
@@ -84,18 +84,15 @@ export class ConsoleInputParser {
       args,
       command,
     });
-    const argsInput = this.extractArguments({
-      args: parsed.args,
-      command,
-    });
-    const optionsInput = this.extractOptions({
-      options: parsed.options,
-      command,
-    });
-
     return {
-      argsInput,
-      optionsInput,
+      args: this.extractArguments({
+        args: parsed.args,
+        command,
+      }),
+      options: this.extractOptions({
+        options: parsed.options,
+        command,
+      }),
     };
   }
 

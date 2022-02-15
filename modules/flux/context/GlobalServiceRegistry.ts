@@ -11,7 +11,7 @@ export type GenericTuple<TTuple, TContext> = {
 export class GlobalServiceRegistry {
   readonly #context: Context;
   readonly #promises = new Map<Key, Deferred<unknown>>();
-  readonly #services = new Map<Key, GlobalService>();
+  readonly services = new Map<Key, GlobalService>();
 
   public constructor(
     { context }: {
@@ -29,7 +29,7 @@ export class GlobalServiceRegistry {
       kind: "global-service-registering",
       message: `Registering global service named (${key.toString()}) depends (${deps}).`,
     });
-    this.#services.set(key, globalService);
+    this.services.set(key, globalService);
     const dependencies = {} as Record<string, unknown>;
     const promises = globalDeps.map(async (dependencyKey: Key) => {
       const dependency = await this.fetchByKey(dependencyKey);
@@ -77,7 +77,7 @@ export class GlobalServiceRegistry {
   private async timeout(serviceKey: Key): Promise<void> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const service = this.#services.get(serviceKey);
+        const service = this.services.get(serviceKey);
         if (service === undefined) {
           reject(
             new Error(

@@ -7,12 +7,12 @@ export class ParticleRegistry {
   public readonly particles = new Set<Particle>();
 
   public async registerParticle(particle: Particle): Promise<void> {
-    const {name} = particle;
+    const { name } = particle;
     debug({
       channel: "FLUX",
       kind: "particle-registering",
       message: `Registering particle (${name})...`,
-      parameters: {name},
+      parameters: { name },
     });
     this.particles.add(particle);
     if (particle.initParticles !== undefined) {

@@ -1,9 +1,8 @@
 import { ConsoleCommand } from "../../console/define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../console/define/ConsoleOutput.ts";
-import { HelpOptions,helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
-import { NullArgs,nullArgsLayout } from "../../console/embedded/null/NullArgs.ts";
+import { HelpOptions, helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
+import { NullArgs, nullArgsLayout } from "../../console/embedded/null/NullArgs.ts";
 import { Table } from "../../console/runtime/Table.ts";
-import { UsagePrinter } from "../../console/runtime/UsagePrinter.ts";
 import { GlobalService } from "../../flux/context/GlobalService.ts";
 import { ConfigGetter } from "../ConfigGetter.ts";
 import { ConfigRegistry } from "../ConfigRegistry.ts";
@@ -26,23 +25,14 @@ export class ListConfigEntriesCommand extends ConsoleCommand<NullArgs, HelpOptio
   }
 
   public async execute(
-    { configGetter, configRegistry, globalContext }: {
+    { configGetter, configRegistry }: {
       configGetter: ConfigGetter;
       configRegistry: ConfigRegistry;
-      globalContext: unknown;
     },
-    { executableName, options, output }: {
-      executableName: string;
-      options: HelpOptions;
+    { output }: {
       output: ConsoleOutput;
     },
   ): Promise<number> {
-    if (options.help === true) {
-      const usagePrinter = new UsagePrinter({ executableName, output });
-      usagePrinter.writeHelp(this);
-      return 0;
-    }
-
     const headers: ConfigEntryRow = {
       defaults: "DEFAULT",
       description: "COMMENT",

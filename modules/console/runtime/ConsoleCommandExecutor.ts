@@ -5,6 +5,7 @@ import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 import { ConsoleInputParser } from "./ConsoleInputParser.ts";
 import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
 import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { UsagePrinter } from "./UsagePrinter.ts";
 
 export interface ConsoleCommandExecutorOptions {
   args: string[];
@@ -39,17 +40,19 @@ export async function provideConsoleCommandExecutor(
       kind: "console-command-executing",
       message: `Executing command (${command.name}) with (${argsString})...`,
     });
+    let options: Record<string, unknown>;
     let localContext: Context;
     try {
-      const { argsInput, optionsInput } = consoleInputParser.parse({
+      const parsed = consoleInputParser.parse({
         args,
         command,
       });
+      options = parsed.options;
       localContext = createScopedContext();
-      localContext["args"] = argsInput;
+      localContext["args"] = parsed.args;
       localContext["command"] = command;
       localContext["executableName"] = executableName;
-      localContext["options"] = optionsInput;
+      localContext["options"] = parsed.options;
       localContext["output"] = output;
       localContext["previousCommand"] = currentCommand;
     } catch (error: unknown) {
@@ -57,6 +60,12 @@ export async function provideConsoleCommandExecutor(
         output.writeLine(error.message);
       }
       return 1;
+    }
+
+    if (options.help === true) {
+      const usagePrinter = new UsagePrinter({ executableName, output });
+      usagePrinter.writeHelp(command);
+      return 0;
     }
 
     try {

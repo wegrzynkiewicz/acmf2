@@ -2,18 +2,18 @@ import { AggregateCommand } from "../../console/embedded/aggregate/AggregateComm
 import { HelpOptions, helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
 import { GlobalService } from "../../flux/context/GlobalService.ts";
 
-export class ConfigCommand extends AggregateCommand<HelpOptions> {
+export class ServicesCommand extends AggregateCommand<HelpOptions> {
   public constructor() {
     super({
-      description: "Displays information about application configuration.",
-      name: "config",
+      description: "Displays information about services in application.",
+      name: "services",
       options: helpOptionsLayout,
     });
   }
 }
 
-export const configCommandService: GlobalService = {
+export const servicesCommandService: GlobalService = {
   globalDeps: [],
-  key: "configCommand",
-  provider: async () => new ConfigCommand(),
+  key: "servicesCommand",
+  provider: async () => new ServicesCommand(),
 };

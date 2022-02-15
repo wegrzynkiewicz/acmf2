@@ -1,6 +1,6 @@
 import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
 
-export interface NullArgs {}
+export type NullArgs = Record<never, never>;
 
 export const nullArgsLayout: LayoutConsoleArguments<NullArgs> = {
   properties: {},

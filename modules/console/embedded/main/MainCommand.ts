@@ -41,17 +41,11 @@ export class MainCommand extends ConsoleCommand<AggregateArgs, MainOptions> {
       output: ConsoleOutput;
     },
   ): Promise<number> {
-    const usagePrinter = new UsagePrinter({ executableName, output });
-    if (options.help === true) {
-      usagePrinter.writeHelp(this);
-      return 0;
-    }
-
     if (options.quiet === true) {
       output = new NullConsoleOutput();
     }
-
     if (args.command === undefined || args.command === "") {
+      const usagePrinter = new UsagePrinter({ executableName, output });
       usagePrinter.writeHelp(this);
       output.writeLine(
         `Type \`${executableName} help [command]\` for more information on specific commands.\n`,
