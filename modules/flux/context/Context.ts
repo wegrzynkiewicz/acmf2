@@ -1,4 +1,5 @@
 export type Key = string | symbol;
+// deno-lint-ignore no-explicit-any
 export type Context = any;
 export type GlobalContext = Context;
 export type ScopedContext = Context;

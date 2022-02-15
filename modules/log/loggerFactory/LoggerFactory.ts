@@ -24,7 +24,7 @@ export async function provideLoggerFactory(
       ...extraParameters,
     };
     const logger = new BasicLogger(
-      globalContext as any,
+      globalContext,
       { parameters },
     );
     return logger;

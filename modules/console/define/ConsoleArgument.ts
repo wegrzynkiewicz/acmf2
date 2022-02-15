@@ -19,11 +19,11 @@ export type LayoutConsoleArguments<T> = {
     & {
       +readonly [K in keyof T]-?: LayoutConsoleArgument<T[K]>;
     }
-    & (unknown extends T ? { [K: string]: LayoutUnknownConsoleArgument } : {});
+    & (unknown extends T ? { [K: string]: LayoutUnknownConsoleArgument } : unknown);
   required?:
     & {
       +readonly [K in keyof T]-?: boolean;
     }
-    & (unknown extends T ? { [K: string]: boolean } : {});
+    & (unknown extends T ? { [K: string]: boolean } : unknown);
   type: "object";
 };

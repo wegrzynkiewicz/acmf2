@@ -1,7 +1,6 @@
 import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
 import { ParticleRegistry } from "./ParticleRegistry.ts";
-import { getPrototypeName } from "../../common/getPrototypeName.ts";
 import { GlobalService } from "../context/GlobalService.ts";
 import { GlobalContext } from "../context/Context.ts";
 

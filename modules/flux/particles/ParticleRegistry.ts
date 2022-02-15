@@ -1,6 +1,5 @@
 import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
-import { getPrototypeName } from "../../common/getPrototypeName.ts";
 import { GlobalService } from "../context/GlobalService.ts";
 
 export class ParticleRegistry {
@@ -16,8 +15,9 @@ export class ParticleRegistry {
     });
     this.particles.add(particle);
     if (particle.initParticles !== undefined) {
-      const particleRegistry = this;
-      await particle.initParticles({ particleRegistry });
+      await particle.initParticles({
+        particleRegistry: this,
+      });
     }
   }
 }

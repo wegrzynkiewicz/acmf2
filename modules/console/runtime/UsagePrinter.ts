@@ -215,7 +215,7 @@ export class UsagePrinter {
     command: UnknownConsoleCommand,
   ): UsageInfo {
     const { name, description } = command;
-    let header = `  ${name}`;
+    const header = `  ${name}`;
     const usageTable: UsageInfo = {
       description,
       header,

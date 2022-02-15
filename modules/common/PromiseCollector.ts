@@ -2,7 +2,7 @@ import { Deferred, deferred } from "../deps.ts";
 
 export class PromiseCollector {
   private readonly promises = new Set<Promise<unknown>>();
-  public resolved: boolean = false;
+  public resolved = false;
   private main: Deferred<void> = deferred();
 
   public constructor(promises?: Promise<unknown>[]) {

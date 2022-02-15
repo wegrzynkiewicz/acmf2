@@ -54,7 +54,7 @@ export class HelpCommand extends ConsoleCommand<HelpArgs, HelpOptions> {
   }
 
   public async execute(
-    globalContext: Context,
+    _globalContext: Context,
     { args, executableName, options, output, previousCommand }: {
       args: HelpArgs;
       executableName: string;

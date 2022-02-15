@@ -27,11 +27,11 @@ export type LayoutConsoleOptions<T> = {
     & {
       +readonly [K in keyof T]-?: LayoutConsoleOption<T[K]>;
     }
-    & (unknown extends T ? { [K: string]: LayoutUnknownConsoleOption } : {});
+    & (unknown extends T ? { [K: string]: LayoutUnknownConsoleOption } : unknown);
   required?:
     & {
       +readonly [K in keyof T]-?: boolean;
     }
-    & (unknown extends T ? { [K: string]: boolean } : {});
+    & (unknown extends T ? { [K: string]: boolean } : unknown);
   type: "object";
 };

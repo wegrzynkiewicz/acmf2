@@ -75,7 +75,7 @@ export class GlobalServiceRegistry {
   }
 
   private async timeout(serviceKey: Key): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, reject) => {
       setTimeout(() => {
         const service = this.services.get(serviceKey);
         if (service === undefined) {
