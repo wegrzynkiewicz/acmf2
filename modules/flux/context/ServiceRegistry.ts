@@ -7,7 +7,7 @@ export type GenericTuple<TTuple, TContext> = {
 };
 
 async function timeout(serviceKey: symbol): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((_resolve, reject) => {
     setTimeout(() => {
       reject(
         new Error(`Cannot resolve service named (${serviceKey.description}).`),

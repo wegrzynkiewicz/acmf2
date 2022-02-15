@@ -37,4 +37,5 @@ export const logParticle: Particle = {
       globalServiceRegistry.registerService(loggerFactoryService),
     ]);
   },
+  name: "log",
 };

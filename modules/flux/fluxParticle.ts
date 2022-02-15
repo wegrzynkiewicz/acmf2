@@ -14,4 +14,5 @@ export const fluxParticle: Particle = {
       globalServiceRegistry.registerService(startUpArgsService),
     ]);
   },
+  name: "flux",
 };

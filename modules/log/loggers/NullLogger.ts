@@ -1,47 +1,47 @@
-import { Logger, LoggerInput } from "./Logger.ts";
+import { Logger } from "./Logger.ts";
 
 export class NullLogger implements Logger {
-  public clone(additionalParameters: Record<string, unknown>): Logger {
+  public clone(): Logger {
     return new NullLogger();
   }
 
-  public extend(parameters: Record<string, unknown>): void {
+  public extend(): void {
     // nothing
   }
 
-  public emergency(loggerInput: LoggerInput): void {
+  public emergency(): void {
     // nothing
   }
 
-  public alert(loggerInput: LoggerInput): void {
+  public alert(): void {
     // nothing
   }
 
-  public critical(loggerInput: LoggerInput): void {
+  public critical(): void {
     // nothing
   }
 
-  public error(loggerInput: LoggerInput): void {
+  public error(): void {
     // nothing
   }
 
-  public warning(loggerInput: LoggerInput): void {
+  public warning(): void {
     // nothing
   }
 
-  public notice(loggerInput: LoggerInput): void {
+  public notice(): void {
     // nothing
   }
 
-  public info(loggerInput: LoggerInput): void {
+  public info(): void {
     // nothing
   }
 
-  public debug(loggerInput: LoggerInput): void {
+  public debug(): void {
     // nothing
   }
 
-  public silly(loggerInput: LoggerInput): void {
+  public silly(): void {
     // nothing
   }
 }

@@ -23,10 +23,11 @@ export class GlobalServiceRegistry {
 
   public async registerService<T>(globalService: GlobalService): Promise<T> {
     const { key, globalDeps, provider } = globalService;
+    const deps = globalDeps.map((g) => g.toString()).join("; ");
     debug({
       channel: "CONTEXT",
       kind: "global-service-registering",
-      message: `Registering global service named (${key.toString()}) depends.`,
+      message: `Registering global service named (${key.toString()}) depends (${deps}).`,
     });
     this.#services.set(key, globalService);
     const dependencies = {} as Record<string, unknown>;

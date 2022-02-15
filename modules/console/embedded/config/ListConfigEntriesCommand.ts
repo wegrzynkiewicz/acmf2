@@ -15,8 +15,7 @@ export interface ConfigEntryRow {
   value: unknown;
 }
 
-export class ListConfigEntriesCommand
-  extends ConsoleCommand<NullArgs, HelpOptions> {
+export class ListConfigEntriesCommand extends ConsoleCommand<NullArgs, HelpOptions> {
   public constructor() {
     super({
       args: nullArgsLayout,

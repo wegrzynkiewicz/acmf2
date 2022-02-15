@@ -1,14 +1,8 @@
 import { Context } from "../../../flux/context/Context.ts";
 import { GlobalService } from "../../../flux/context/GlobalService.ts";
 import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
-import {
-  ConsoleCommand,
-  UnknownConsoleCommand,
-} from "../../define/ConsoleCommand.ts";
-import {
-  LayoutBooleanConsoleOption,
-  LayoutConsoleOptions,
-} from "../../define/ConsoleOption.ts";
+import { ConsoleCommand, UnknownConsoleCommand } from "../../define/ConsoleCommand.ts";
+import { LayoutBooleanConsoleOption, LayoutConsoleOptions } from "../../define/ConsoleOption.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
 

@@ -42,8 +42,7 @@ export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
     debug({
       channel: "CONSOLE",
       kind: "console-command-registering",
-      message:
-        `Registering console command (${name}) to parent command (${this.name})`,
+      message: `Registering console command (${name}) to parent command (${this.name})`,
     });
     this.commands.set(name, command);
   }
@@ -59,8 +58,7 @@ export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
     }
     throw new Breaker({
       kind: "console-command-missing",
-      message:
-        `Command named (${commandName}) not exists in parent command (${this.name}).`,
+      message: `Command named (${commandName}) not exists in parent command (${this.name}).`,
       status: 1,
     });
   }

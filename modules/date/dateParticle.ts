@@ -12,4 +12,5 @@ export const dateParticle: Particle = {
       globalServiceRegistry.registerService(currentDateProviderService),
     ]);
   },
+  name: "date",
 };

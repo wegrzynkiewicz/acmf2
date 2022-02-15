@@ -35,4 +35,5 @@ export const versionParticle: Particle = {
       globalServiceRegistry.registerService(versionCommandService),
     ]);
   },
+  name: "version",
 };

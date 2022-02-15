@@ -1,4 +1,4 @@
-import { assertEquals, deferred } from "../deps.ts";
+import { deferred } from "../deps.ts";
 import { PromiseCollector } from "./PromiseCollector.ts";
 
 Deno.test("PromiseCollector resolve empty", async () => {

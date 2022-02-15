@@ -65,7 +65,7 @@ export interface ParsedInput {
 export type ArgumentType = number | string;
 
 export type OptionsType = {
-  [k: string]: any;
+  [k: string]: unknown;
 };
 
 export interface ParsedFromCLI {
@@ -136,9 +136,7 @@ export class ConsoleInputParser {
     });
 
     const { _: parsedArguments, "--": dashes, ...parsedOptions } = parsedArgs;
-    const afterDashes = Array.isArray(dashes) && dashes.length > 0
-      ? (["--", ...dashes] as string[])
-      : [];
+    const afterDashes = Array.isArray(dashes) && dashes.length > 0 ? (["--", ...dashes] as string[]) : [];
     const allArguments = [...parsedArguments, ...afterDashes];
 
     return {

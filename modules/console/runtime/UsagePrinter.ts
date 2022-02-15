@@ -210,7 +210,9 @@ export class UsagePrinter {
     return list;
   }
 
-  public getAvailableCommandDescription(command: UnknownConsoleCommand): UsageInfo {
+  public getAvailableCommandDescription(
+    command: UnknownConsoleCommand,
+  ): UsageInfo {
     const { name, description } = command;
     let header = `  ${name}`;
     const usageTable: UsageInfo = {

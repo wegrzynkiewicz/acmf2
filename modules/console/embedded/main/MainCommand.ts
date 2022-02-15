@@ -4,10 +4,7 @@ import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { ConsoleCommandExecutor } from "../../runtime/ConsoleCommandExecutor.ts";
 import { NullConsoleOutput } from "../../runtime/NullConsoleOutput.ts";
 import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import {
-  AggregateArgs,
-  aggregateArgsLayout,
-} from "../aggregate/AggregateCommand.ts";
+import { AggregateArgs, aggregateArgsLayout } from "../aggregate/AggregateCommand.ts";
 import { helpOptionLayout } from "../help/HelpCommand.ts";
 import { quietOptionLayout } from "../quiet/quietOptionLayout.ts";
 

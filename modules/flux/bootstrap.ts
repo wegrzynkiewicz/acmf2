@@ -2,14 +2,8 @@ import { configRegistryService } from "../config/ConfigRegistry.ts";
 import { createGlobalContext } from "./context/Context.ts";
 import { GlobalServiceRegistry } from "./context/GlobalServiceRegistry.ts";
 import { Particle } from "./particles/Particle.ts";
-import {
-  ParticleManager,
-  particleManagerService,
-} from "./particles/ParticleManager.ts";
-import {
-  ParticleRegistry,
-  particleRegistryService,
-} from "./particles/ParticleRegistry.ts";
+import { ParticleManager, particleManagerService } from "./particles/ParticleManager.ts";
+import { ParticleRegistry, particleRegistryService } from "./particles/ParticleRegistry.ts";
 
 export async function bootstrap(
   { particles }: {

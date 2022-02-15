@@ -45,8 +45,7 @@ export class DenoConfigResolver implements ConfigResolver {
       debug({
         channel: "CONFIG",
         kind: "config-resolving",
-        message:
-          `Resolving config entry named (${key}) with default value (${defaults}).`,
+        message: `Resolving config entry named (${key}) with default value (${defaults}).`,
       });
       return defaults;
     }

@@ -1,9 +1,4 @@
-import {
-  LayoutArray,
-  LayoutBoolean,
-  LayoutNumber,
-  LayoutString,
-} from "../../layout/layout.ts";
+import { LayoutArray, LayoutBoolean, LayoutNumber, LayoutString } from "../../layout/layout.ts";
 
 type LayoutUnknownConsoleArgument =
   | LayoutString
@@ -11,8 +6,7 @@ type LayoutUnknownConsoleArgument =
   | LayoutNumber
   | LayoutArray<unknown>;
 
-type Positive<T> = T extends Array<infer U>
-  ? (U extends boolean | number | string ? LayoutArray<U> : never)
+type Positive<T> = T extends Array<infer U> ? (U extends boolean | number | string ? LayoutArray<U> : never)
   : T extends string ? LayoutString
   : T extends boolean ? LayoutBoolean
   : T extends number ? LayoutNumber

@@ -25,8 +25,13 @@ export async function provideConsoleCommandExecutor(
   },
 ): Promise<ConsoleCommandExecutor> {
   const executeCommand = async (
-    { args, command, currentCommand, executableName, output }:
-      ConsoleCommandExecutorOptions,
+    {
+      args,
+      command,
+      currentCommand,
+      executableName,
+      output,
+    }: ConsoleCommandExecutorOptions,
   ): Promise<number> => {
     const argsString = args.join(" ");
     debug({

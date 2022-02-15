@@ -35,8 +35,7 @@ export class VersionCommand extends ConsoleCommand<NullArgs, HelpOptions> {
 
     const consoleVersion = await versionProvider.provideVersionInfo();
     const { version, copyright, intro, revision } = consoleVersion;
-    const string =
-      `${intro} version ${version} revision ${revision} copyright ${copyright}`;
+    const string = `${intro} version ${version} revision ${revision} copyright ${copyright}`;
     output.writeLine(string);
 
     return 0;

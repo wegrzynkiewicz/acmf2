@@ -31,8 +31,7 @@ export const aggregateArgsLayout: LayoutConsoleArguments<AggregateArgs> = {
   type: "object",
 };
 
-export class AggregateCommand<TOptions extends { help: boolean }>
-  extends ConsoleCommand<AggregateArgs, TOptions> {
+export class AggregateCommand<TOptions extends { help: boolean }> extends ConsoleCommand<AggregateArgs, TOptions> {
   public constructor(
     { description, name, options }: {
       description?: string;

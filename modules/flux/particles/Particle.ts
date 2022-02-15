@@ -23,4 +23,5 @@ export interface Particle {
     },
   ) => Promise<void>;
   execute?: (globalContext: GlobalContext) => Promise<void>;
+  name: string;
 }

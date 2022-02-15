@@ -1,8 +1,4 @@
-import {
-  LayoutBoolean,
-  LayoutNumber,
-  LayoutString,
-} from "../../layout/layout.ts";
+import { LayoutBoolean, LayoutNumber, LayoutString } from "../../layout/layout.ts";
 import { ConsoleOptionParameter } from "./ConsoleOptionParameter.ts";
 
 export interface ConsoleFlags {
@@ -28,14 +24,14 @@ export type LayoutConsoleOption<T> = Positive<Exclude<T, null | undefined>>;
 
 export type LayoutConsoleOptions<T> = {
   properties:
-  & {
-    +readonly [K in keyof T]-?: LayoutConsoleOption<T[K]>;
-  }
-  & (unknown extends T ? { [K: string]: LayoutUnknownConsoleOption } : {});
+    & {
+      +readonly [K in keyof T]-?: LayoutConsoleOption<T[K]>;
+    }
+    & (unknown extends T ? { [K: string]: LayoutUnknownConsoleOption } : {});
   required?:
-  & {
-    +readonly [K in keyof T]-?: boolean;
-  }
-  & (unknown extends T ? { [K: string]: boolean } : {});
+    & {
+      +readonly [K in keyof T]-?: boolean;
+    }
+    & (unknown extends T ? { [K: string]: boolean } : {});
   type: "object";
 };

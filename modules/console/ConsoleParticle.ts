@@ -1,27 +1,15 @@
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
-import {
-  ConfigCommand,
-  configCommandService,
-} from "./embedded/config/ConfigCommand.ts";
+import { ConfigCommand, configCommandService } from "./embedded/config/ConfigCommand.ts";
 import {
   ListConfigEntriesCommand,
   listConfigEntriesCommandService,
 } from "./embedded/config/ListConfigEntriesCommand.ts";
-import {
-  ConsoleCommandExecutor,
-  consoleCommandExecutorService,
-} from "./runtime/ConsoleCommandExecutor.ts";
+import { ConsoleCommandExecutor, consoleCommandExecutorService } from "./runtime/ConsoleCommandExecutor.ts";
 import { consoleInputParserService } from "./runtime/ConsoleInputParser.ts";
 import { StreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
-import {
-  MainCommand,
-  mainCommandService,
-} from "./embedded/main/MainCommand.ts";
-import {
-  HelpCommand,
-  helpCommandService,
-} from "./embedded/help/HelpCommand.ts";
+import { MainCommand, mainCommandService } from "./embedded/main/MainCommand.ts";
+import { HelpCommand, helpCommandService } from "./embedded/help/HelpCommand.ts";
 import { GlobalServiceRegistry } from "../flux/context/GlobalServiceRegistry.ts";
 
 export const consoleParticle: Particle = {
@@ -54,7 +42,6 @@ export const consoleParticle: Particle = {
       globalServiceRegistry.registerService(listConfigEntriesCommandService),
     ]);
   },
-
   async execute(
     {
       consoleCommandExecutor,
@@ -79,4 +66,5 @@ export const consoleParticle: Particle = {
     });
     // TODO: return exit code
   },
+  name: "console",
 };
