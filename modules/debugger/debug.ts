@@ -24,7 +24,7 @@ let debug: DebugFunction = (): void => {
 
 if (typeof Deno === "object") {
   try {
-    const allow = Deno.env.get("APP_DEBUGGER_ENABLED");
+    const allow = Deno.env.get("DEBUG");
     if (allow === "1") {
       debug = consoleDebug;
     }

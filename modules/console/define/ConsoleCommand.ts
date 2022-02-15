@@ -70,6 +70,6 @@ export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
     _localContext?: Context,
     _options?: Context,
   ): Promise<number> {
-    throw new Error("Console header must implement execute method.");
+    throw new Error("Console command must implement execute method.");
   }
 }

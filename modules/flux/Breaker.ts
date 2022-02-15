@@ -18,16 +18,13 @@ export class Breaker extends Error {
     if (message === undefined) {
       message = kind;
     }
-    super(message);
+    super(message, { cause: error });
     this.args = args;
     this.kind = kind;
     this.error = error;
     this.status = status;
     if (args !== undefined) {
       this.stack += `\n---\nArguments: \n${JSON.stringify(args)}`;
-    }
-    if (error instanceof Error) {
-      this.stack += `\n---\nPrevious error: \n${error.stack ?? error.message}`;
     }
   }
 }

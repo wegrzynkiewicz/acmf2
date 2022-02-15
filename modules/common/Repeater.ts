@@ -1,3 +1,5 @@
+import { sleep } from "./sleep.ts";
+
 /**
  * Create a function that will call the callback the indicated number of tries
  * in intervals until the correct result is obtained
@@ -32,14 +34,8 @@ export class Repeater<T> {
         if (this.tries === 0) {
           throw error;
         }
-        await this.sleep(this.interval);
+        await sleep(this.interval);
       }
     }
-  }
-
-  private async sleep(milliseconds: number): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(resolve, milliseconds);
-    });
   }
 }
