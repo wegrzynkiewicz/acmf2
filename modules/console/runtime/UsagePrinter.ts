@@ -207,6 +207,7 @@ export class UsagePrinter {
         list.push(this.getAvailableCommandDescription(child));
       }
     }
+    list.sort((a, b) => a.header.localeCompare(b.header));
     return list;
   }
 

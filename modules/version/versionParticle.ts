@@ -14,7 +14,7 @@ export const versionParticle: Particle = {
       versionCommand: VersionCommand;
     },
   ): Promise<void> {
-    mainCommand.registerCommand(versionCommand);
+    mainCommand.assignCommand(versionCommand);
   },
   async initConfigVariables(
     { configRegistry }: {

@@ -37,12 +37,12 @@ export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
     }
   }
 
-  public registerCommand(command: UnknownConsoleCommand): void {
+  public assignCommand(command: UnknownConsoleCommand): void {
     const { name } = command;
     debug({
       channel: "CONSOLE",
-      kind: "console-command-registering",
-      message: `Registering console command (${name}) to parent command (${this.name})`,
+      kind: "console-command-assigning",
+      message: `Assigning console command (${name}) to parent command (${this.name}).`,
     });
     this.commands.set(name, command);
   }

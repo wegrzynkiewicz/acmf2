@@ -26,11 +26,10 @@ export async function provideParticleManager(
     stageName: K,
   ): Promise<void> {
     if (typeof particle[stageName] === "function") {
-      const particleName = getPrototypeName(particle);
       debug({
         channel: "FLUX",
         kind: "particle-executing",
-        message: `Particle executing (${particleName}.${stageName})...`,
+        message: `Particle executing (${particle.name}.${stageName})...`,
       });
       const method = particle[stageName] as ((
         globalContext: GlobalContext,

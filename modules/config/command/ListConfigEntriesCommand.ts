@@ -1,12 +1,12 @@
-import { ConfigGetter } from "../../../config/ConfigGetter.ts";
-import { ConfigRegistry } from "../../../config/ConfigRegistry.ts";
-import { GlobalService } from "../../../flux/context/GlobalService.ts";
-import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
-import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
-import { Table } from "../../runtime/Table.ts";
-import { UsagePrinter } from "../../runtime/UsagePrinter.ts";
-import { HelpOptions, helpOptionsLayout } from "../help/HelpCommand.ts";
-import { NullArgs, nullArgsLayout } from "../null/NullArgs.ts";
+import { ConsoleCommand } from "../../console/define/ConsoleCommand.ts";
+import { ConsoleOutput } from "../../console/define/ConsoleOutput.ts";
+import { HelpOptions,helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
+import { NullArgs,nullArgsLayout } from "../../console/embedded/null/NullArgs.ts";
+import { Table } from "../../console/runtime/Table.ts";
+import { UsagePrinter } from "../../console/runtime/UsagePrinter.ts";
+import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { ConfigGetter } from "../ConfigGetter.ts";
+import { ConfigRegistry } from "../ConfigRegistry.ts";
 
 export interface ConfigEntryRow {
   defaults: string;
