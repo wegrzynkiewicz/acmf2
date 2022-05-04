@@ -1,21 +1,15 @@
 import { debug } from "../../debugger/debug.ts";
 import { Deferred, deferred } from "../../deps.ts";
-import { Context, Key } from "./GlobalContext.ts";
-import { GlobalService } from "./GlobalService.ts";
-
-export type GenericTuple<TTuple, TContext> = {
-  [P in keyof TTuple]: TTuple[P] extends keyof TContext ? TContext[TTuple[P]]
-    : never;
-};
+import { GlobalContext, GlobalKey, GlobalService } from "./global.ts";
 
 export class GlobalServiceRegistry {
-  readonly #context: Context;
-  readonly #promises = new Map<Key, Deferred<unknown>>();
-  readonly services = new Map<Key, GlobalService>();
+  readonly #context: GlobalContext;
+  readonly #promises = new Map<GlobalKey, Deferred<unknown>>();
+  readonly services = new Map<GlobalKey, GlobalService>();
 
   public constructor(
     { context }: {
-      context: Context;
+      context: GlobalContext;
     },
   ) {
     this.#context = context;
@@ -31,7 +25,7 @@ export class GlobalServiceRegistry {
     });
     this.services.set(key, globalService);
     const dependencies = {} as Record<string, unknown>;
-    const promises = globalDeps.map(async (dependencyKey: Key) => {
+    const promises = globalDeps.map(async (dependencyKey: GlobalKey) => {
       const dependency = await this.fetchByKey(dependencyKey);
       dependencies[dependencyKey as string] = dependency;
     });
@@ -51,7 +45,7 @@ export class GlobalServiceRegistry {
     return service as T;
   }
 
-  public fetchByKey(serviceKey: Key): Promise<unknown> {
+  public fetchByKey(serviceKey: GlobalKey): Promise<unknown> {
     const service = this.#context[serviceKey];
     if (service !== undefined) {
       return Promise.resolve(service);
@@ -74,7 +68,7 @@ export class GlobalServiceRegistry {
     return promise;
   }
 
-  private async timeout(serviceKey: Key): Promise<void> {
+  private async timeout(serviceKey: GlobalKey): Promise<void> {
     return new Promise((_resolve, reject) => {
       setTimeout(() => {
         const service = this.services.get(serviceKey);

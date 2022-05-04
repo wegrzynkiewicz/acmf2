@@ -3,7 +3,7 @@ import { ConsoleOutput } from "../../console/define/ConsoleOutput.ts";
 import { HelpOptions, helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
 import { NullArgs, nullArgsLayout } from "../../console/embedded/null/NullArgs.ts";
 import { Table } from "../../console/runtime/Table.ts";
-import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { GlobalService } from "../../flux/context/global.ts";
 import { ConfigGetter } from "../ConfigGetter.ts";
 import { ConfigRegistry } from "../ConfigRegistry.ts";
 

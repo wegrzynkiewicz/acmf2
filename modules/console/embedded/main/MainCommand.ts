@@ -1,4 +1,4 @@
-import { GlobalService } from "../../../flux/context/GlobalService.ts";
+import { GlobalService } from "../../../flux/context/global.ts";
 import { ConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../../define/ConsoleOutput.ts";
 import { ConsoleCommandExecutor } from "../../runtime/ConsoleCommandExecutor.ts";

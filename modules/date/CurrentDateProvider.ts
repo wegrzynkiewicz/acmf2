@@ -1,4 +1,4 @@
-import { GlobalService } from "../flux/context/GlobalService.ts";
+import { GlobalService } from "../flux/context/global.ts";
 
 export interface CurrentDateProvider {
   provideCurrentDate: () => Date;

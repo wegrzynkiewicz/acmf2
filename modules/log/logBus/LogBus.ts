@@ -1,4 +1,4 @@
-import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { GlobalService } from "../../flux/context/global.ts";
 import { StandardStreams } from "../../flux/streams/StandardStreams.ts";
 import { LogHandler } from "../handlers/LogHandler.ts";
 import { provideStreamHandler } from "../handlers/StreamLogHandler.ts";

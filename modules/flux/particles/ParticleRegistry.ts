@@ -1,6 +1,6 @@
 import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
-import { GlobalService } from "../context/GlobalService.ts";
+import { GlobalService } from "../context/global.ts";
 
 export class ParticleRegistry {
   public readonly particles = new Set<Particle>();

@@ -1,5 +1,5 @@
 import { DeferredMap } from "../../common/async/DeferredMap.ts";
-import { GlobalKey, GlobalService } from "./GlobalContext.ts";
+import { GlobalKey, GlobalService } from "./global.ts";
 
 export class GlobalServiceResolver {
   // readonly #globalContext: GlobalContext;

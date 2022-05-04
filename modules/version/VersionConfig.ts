@@ -1,6 +1,6 @@
 import { ConfigGetter } from "../config/ConfigGetter.ts";
 import { ConfigVariable } from "../config/ConfigVariable.ts";
-import { GlobalService } from "../flux/context/GlobalService.ts";
+import { GlobalService } from "../flux/context/global.ts";
 
 export interface VersionConfig {
   revision: string;

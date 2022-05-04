@@ -1,4 +1,4 @@
-import { GlobalService } from "../context/GlobalService.ts";
+import { GlobalService } from "../context/global.ts";
 import { provideDenoArgs } from "./provideDenoArgs.ts";
 
 export type StartUpArgs = string[];

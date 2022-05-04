@@ -1,7 +1,7 @@
 import { debug } from "../../debugger/debug.ts";
 import { ArgParsingOptions, parse } from "../../deps.ts";
 import { Breaker } from "../../flux/Breaker.ts";
-import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { GlobalService } from "../../flux/context/global.ts";
 import { isPrimitiveLayout } from "../../layout/helpers/isPrimitiveLayout.ts";
 import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
 

@@ -27,7 +27,7 @@ export class DenoConfigResolver implements ConfigResolver {
     } catch (error: unknown) {
       if (defaults === undefined) {
         throw new Error(`Cannot resolve config variable named (${key}).`, {
-          cause: error,
+          cause: error instanceof Error ? error : undefined,
         });
       }
     }

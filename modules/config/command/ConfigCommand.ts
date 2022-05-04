@@ -1,6 +1,6 @@
 import { AggregateCommand } from "../../console/embedded/aggregate/AggregateCommand.ts";
 import { HelpOptions, helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
-import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { GlobalService } from "../../flux/context/global.ts";
 
 export class ConfigCommand extends AggregateCommand<HelpOptions> {
   public constructor() {

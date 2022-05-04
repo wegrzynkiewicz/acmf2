@@ -1,13 +1,13 @@
 import { debug } from "../../debugger/debug.ts";
-import { ExecutableHandler } from "../../flux/context/Executable.ts";
 import { Breaker } from "../../flux/Breaker.ts";
-import { Context, GlobalContext } from "../../flux/context/GlobalContext.ts";
+import { GlobalContext } from "../../flux/context/global.ts";
+import { ScopedContext } from "../../flux/context/scoped.ts";
 import { LayoutConsoleArguments } from "./ConsoleArgument.ts";
 import { LayoutConsoleOptions } from "./ConsoleOption.ts";
 
 export type UnknownConsoleCommand = ConsoleCommand<unknown, unknown>;
 
-export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
+export class ConsoleCommand<TArgs, TOptions> {
   public readonly aliases = new Set<string>();
   public readonly args: LayoutConsoleArguments<TArgs>;
   public readonly commands = new Map<string, UnknownConsoleCommand>();
@@ -65,8 +65,8 @@ export class ConsoleCommand<TArgs, TOptions> implements ExecutableHandler {
 
   public execute(
     _globalContext: GlobalContext,
-    _localContext?: Context,
-    _options?: Context,
+    _localContext?: ScopedContext,
+    _options?: unknown,
   ): Promise<number> {
     throw new Error("Console command must implement execute method.");
   }

@@ -1,5 +1,5 @@
 import { debug } from "../debugger/debug.ts";
-import { GlobalService } from "../flux/context/GlobalService.ts";
+import { GlobalService } from "../flux/context/global.ts";
 import { ConfigVariable } from "./ConfigVariable.ts";
 
 export class ConfigRegistry {

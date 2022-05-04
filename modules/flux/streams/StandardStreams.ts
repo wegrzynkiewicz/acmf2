@@ -1,4 +1,4 @@
-import { GlobalService } from "../context/GlobalService.ts";
+import { GlobalService } from "../context/global.ts";
 import { provideDenoSTDStreams } from "./provideDenoSTDStreams.ts";
 
 export interface StandardStreams {

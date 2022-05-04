@@ -1,5 +1,5 @@
 import { CurrentDateProvider } from "../date/CurrentDateProvider.ts";
-import { GlobalService } from "../flux/context/GlobalService.ts";
+import { GlobalService } from "../flux/context/global.ts";
 import { VersionConfig } from "./VersionConfig.ts";
 
 export interface VersionInfo {

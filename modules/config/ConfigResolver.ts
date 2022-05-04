@@ -1,4 +1,4 @@
-import { GlobalService } from "../flux/context/GlobalService.ts";
+import { GlobalService } from "../flux/context/global.ts";
 import { ConfigGetter } from "./ConfigGetter.ts";
 import { ConfigRegistry } from "./ConfigRegistry.ts";
 import { DenoConfigResolver } from "./DenoConfigResolver.ts";

@@ -18,7 +18,7 @@ export class Breaker extends Error {
     if (message === undefined) {
       message = kind;
     }
-    super(message, { cause: error });
+    super(message, { cause: error instanceof Error ? error : undefined });
     this.args = args;
     this.kind = kind;
     this.error = error;

@@ -1,11 +1,12 @@
 import { debug } from "../../debugger/debug.ts";
-import { Context, createScopedContext } from "../../flux/context/GlobalContext.ts";
+import { GlobalContext } from "../../flux/context/global.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 import { ConsoleInputParser } from "./ConsoleInputParser.ts";
 import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
-import { GlobalService } from "../../flux/context/GlobalService.ts";
+import { GlobalService } from "../../flux/context/global.ts";
 import { UsagePrinter } from "./UsagePrinter.ts";
+import { createScopedContext } from "../../flux/context/scoped.ts";
 
 export interface ConsoleCommandExecutorOptions {
   args: string[];
@@ -21,7 +22,7 @@ export interface ConsoleCommandExecutor {
 
 export async function provideConsoleCommandExecutor(
   { globalContext, consoleInputParser }: {
-    globalContext: Context;
+    globalContext: GlobalContext;
     consoleInputParser: ConsoleInputParser;
   },
 ): Promise<ConsoleCommandExecutor> {
@@ -41,7 +42,7 @@ export async function provideConsoleCommandExecutor(
       message: `Executing command (${command.name}) with (${argsString})...`,
     });
     let options: Record<string, unknown>;
-    let localContext: Context;
+    let localContext: GlobalContext;
     try {
       const parsed = consoleInputParser.parse({
         args,

@@ -1,5 +1,5 @@
-import { Context } from "../../../flux/context/GlobalContext.ts";
-import { GlobalService } from "../../../flux/context/GlobalService.ts";
+import { GlobalContext } from "../../../flux/context/global.ts";
+import { GlobalService } from "../../../flux/context/global.ts";
 import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
 import { ConsoleCommand, UnknownConsoleCommand } from "../../define/ConsoleCommand.ts";
 import { LayoutBooleanConsoleOption, LayoutConsoleOptions } from "../../define/ConsoleOption.ts";
@@ -54,7 +54,7 @@ export class HelpCommand extends ConsoleCommand<HelpArgs, HelpOptions> {
   }
 
   public async execute(
-    _globalContext: Context,
+    _globalContext: GlobalContext,
     { args, executableName, options, output, previousCommand }: {
       args: HelpArgs;
       executableName: string;
