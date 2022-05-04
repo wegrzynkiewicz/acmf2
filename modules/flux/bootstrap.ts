@@ -17,12 +17,8 @@ export async function bootstrap(
     key: "globalServiceRegistry",
     provider: async () => serviceRegistry,
   });
-  const particleRegistry = await serviceRegistry.registerService<
-    ParticleRegistry
-  >(particleRegistryService);
-  const particleManager = await serviceRegistry.registerService<
-    ParticleManager
-  >(particleManagerService);
+  const particleRegistry = await serviceRegistry.registerService<ParticleRegistry>(particleRegistryService);
+  const particleManager = await serviceRegistry.registerService<ParticleManager>(particleManagerService); 
   await serviceRegistry.registerService(configRegistryService);
 
   for (const particle of particles) {

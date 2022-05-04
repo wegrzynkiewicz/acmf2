@@ -1,9 +1,9 @@
 import { LayoutDataError } from "../common/LayoutDataError.ts";
 import { LayoutInvalidError } from "../common/LayoutInvalidError.ts";
-import { LayoutValidatorResult } from "../common/LayoutValidatorResult.ts";
 import {
   Layout,
   LayoutBoolean,
+  LayoutDescriptor,
   LayoutFloat,
   LayoutInteger,
   LayoutNull,
@@ -12,50 +12,95 @@ import {
   LayoutString,
 } from "../layout.ts";
 
-export class LayoutContext {
+export interface LayoutArgs<T> {
+  data: unknown;
+  layout: LayoutDescriptor<T>;
+}
+
+export interface LayoutContext {
+  errors: Error[];
+  rootData: unknown;
+}
+
+export interface PositiveResult<T> {
+  errors: LayoutDataError[],
+  valid: true;
+  sanitized: T;
+}
+
+export interface NegativeResult {
+  errors: LayoutDataError[];
+  valid: false;
+}
+
+export class LayoutError extends Error {
+  public readonly errors: LayoutDataError[];
+  public constructor(
+    { context, errors, kind }: {
+      context: LayoutContext;
+      errors: LayoutDataError[];
+      kind: string;
+    },
+  ) {
+    super(kind);
+    this.errors = errors;
+    this.name = "LayoutError";
+  }
+}
+
+export type LayoutResolverResult<T> = PositiveResult<T> | NegativeResult;
+
+export interface LayoutResolverOptions {
+  strictMode?: boolean;
 }
 
 export class LayoutResolver {
-  public assert(
-    { data, layout }: {
-      data: unknown;
-      layout: Layout;
-    },
-  ): void {
-    this.resolve({ data, layout });
+  readonly #strictMode;
+  public constructor(options?: LayoutResolverOptions) {
+    const opts = options ?? {};
+    this.#strictMode = opts.strictMode ?? true;
   }
 
-  public validate(
-    { data, layout }: {
-      data: unknown;
-      layout: Layout;
-    },
-  ): LayoutValidatorResult {
-    let errors: Error[] = [];
-    let valid: boolean = true;
+  public assert(args: LayoutArgs<unknown>): void {
+    this.resolve(args);
+  }
+
+  public resolve<T>({ data, layout }: LayoutArgs<T>): T {
+    const context: LayoutContext = {
+      errors: [],
+      rootData: data,
+    };
     try {
-      this.resolve({ data, layout });
+      const value = this.#resolveLayout({ context, data, layout });
+      return value as T;
     } catch (error: unknown) {
-      valid = false;
-      if (error instanceof Error) {
-        errors.push(error);
+      if (error instanceof LayoutDataError) {
+        throw new LayoutError({ errors: [error], context, kind: "test123" });
       }
+      throw error;
     }
-    return { errors, valid };
   }
 
-  public resolve<T>(
-    { data, layout }: {
-      data: unknown;
-      layout: Layout;
-    },
-  ): T {
-    const context = new LayoutContext();
-    const value = this.resolveLayout({ context, data, layout });
-    return value as T;
+  public validate<T>(args: LayoutArgs<T>): LayoutResolverResult<T> {
+    try {
+      const sanitized = this.resolve(args);
+      return {
+        errors: [],
+        sanitized,
+        valid: true,
+      };
+    } catch (error: unknown) {
+      if (error instanceof LayoutError) {
+        return {
+          errors: error.errors,
+          valid: false,
+        };
+      }
+      throw error;
+    }
   }
 
-  protected resolveLayout(
+  #resolveLayout(
     { context, data, layout }: {
       context: LayoutContext;
       data: unknown;
@@ -104,10 +149,31 @@ export class LayoutResolver {
       }
       throw new LayoutDataError({ context, kind: "unexpected-null" });
     }
-    if (typeof data !== "boolean") {
-      throw new LayoutDataError({ context, kind: "unexpected-type" });
+    if (this.#strictMode === true) {
+      if (typeof data !== "boolean") {
+        throw new LayoutDataError({ context, kind: "unexpected-type" });
+      }
+      return data;
     }
-    return data;
+    switch (data) {
+      case true:
+      case "true":
+      case 1:
+      case "1":
+      case "on":
+      case "enabled":
+        return true;
+      case false:
+      case "false":
+      case 0:
+      case "0":
+      case "off":
+      case "disabled":
+        return false;
+      default:
+        // nothing
+    }
+    throw new LayoutDataError({ context, kind: "unexpected-value" });
   }
 
   protected resolveFloat(
@@ -235,7 +301,7 @@ export class LayoutResolver {
       }
       throw new LayoutDataError({ context, kind: "missing-property" });
     }
-    return this.resolveLayout({ context, data, layout: propertyLayout });
+    return this.#resolveLayout({ context, data, layout: propertyLayout });
   }
 
   protected resolveString(

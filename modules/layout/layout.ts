@@ -103,20 +103,20 @@ export type LayoutRecord<T> =
   | LayoutObject<T>
   | LayoutDictionary<T>;
 
+export type LayoutInferable<T> = unknown extends T ? Layout
+  : [T] extends [Array<infer U>] ? LayoutArray<U>
+  : [T] extends [null | undefined] ? LayoutNull
+  : [T] extends [boolean] ? LayoutBoolean
+  : [T] extends [string] ? LayoutString
+  : [T] extends [number] ? LayoutNumber
+  : T extends Record<string, infer U> ? LayoutDictionary<U>
+  : LayoutObject<T>;
+
 export type LayoutDescriptor<T> = (
   | LayoutAny
   | LayoutEnumerable
   | LayoutReference
-  | (
-    unknown extends T ? Layout
-      : [Exclude<T, null | undefined>] extends [Array<infer U>] ? LayoutArray<U>
-      : [T] extends [null | undefined] ? LayoutNull
-      : [Exclude<T, null | undefined>] extends [boolean] ? LayoutBoolean
-      : [Exclude<T, null | undefined>] extends [string] ? LayoutString
-      : [Exclude<T, null | undefined>] extends [number] ? LayoutNumber
-      : T extends Record<string, infer U> ? LayoutDictionary<U>
-      : LayoutObject<T>
-  )
+  | LayoutInferable<Exclude<T, null | undefined>>
 );
 
 export type Layout = (
