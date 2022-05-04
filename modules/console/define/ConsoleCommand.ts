@@ -1,7 +1,7 @@
 import { debug } from "../../debugger/debug.ts";
 import { ExecutableHandler } from "../../flux/context/Executable.ts";
 import { Breaker } from "../../flux/Breaker.ts";
-import { Context, GlobalContext } from "../../flux/context/Context.ts";
+import { Context, GlobalContext } from "../../flux/context/GlobalContext.ts";
 import { LayoutConsoleArguments } from "./ConsoleArgument.ts";
 import { LayoutConsoleOptions } from "./ConsoleOption.ts";
 

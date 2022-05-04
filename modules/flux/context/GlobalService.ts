@@ -1,7 +1,1 @@
-import { GlobalContext, Key } from "./Context.ts";
-
-export interface GlobalService {
-  globalDeps: Key[];
-  key: string;
-  provider: (globalContext: GlobalContext) => Promise<unknown>;
-}
+import { GlobalContext, Key } from "./GlobalContext.ts";

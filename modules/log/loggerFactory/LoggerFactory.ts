@@ -1,4 +1,4 @@
-import { GlobalContext } from "../../flux/context/Context.ts";
+import { GlobalContext } from "../../flux/context/GlobalContext.ts";
 import { GlobalService } from "../../flux/context/GlobalService.ts";
 import { LogConfig } from "../LogConfig.ts";
 import { BasicLogger } from "../loggers/BasicLogger.ts";

@@ -1,5 +1,5 @@
 import { configRegistryService } from "../config/ConfigRegistry.ts";
-import { createGlobalContext } from "./context/Context.ts";
+import { createGlobalContext } from "./context/GlobalContext.ts";
 import { GlobalServiceRegistry } from "./context/GlobalServiceRegistry.ts";
 import { Particle } from "./particles/Particle.ts";
 import { ParticleManager, particleManagerService } from "./particles/ParticleManager.ts";

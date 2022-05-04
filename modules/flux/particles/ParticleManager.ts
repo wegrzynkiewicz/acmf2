@@ -2,7 +2,7 @@ import { debug } from "../../debugger/debug.ts";
 import { Particle } from "./Particle.ts";
 import { ParticleRegistry } from "./ParticleRegistry.ts";
 import { GlobalService } from "../context/GlobalService.ts";
-import { GlobalContext } from "../context/Context.ts";
+import { GlobalContext } from "../context/GlobalContext.ts";
 
 export interface ParticleManager {
   run<K extends keyof Particle>(stageName: K): Promise<void>;

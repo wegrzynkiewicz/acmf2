@@ -1,6 +1,6 @@
 import { debug } from "../../debugger/debug.ts";
 import { Deferred, deferred } from "../../deps.ts";
-import { Context, Key } from "./Context.ts";
+import { Context, Key } from "./GlobalContext.ts";
 import { GlobalService } from "./GlobalService.ts";
 
 export type GenericTuple<TTuple, TContext> = {

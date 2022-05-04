@@ -1,4 +1,4 @@
-import { Context } from "../../../flux/context/Context.ts";
+import { Context } from "../../../flux/context/GlobalContext.ts";
 import { GlobalService } from "../../../flux/context/GlobalService.ts";
 import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
 import { ConsoleCommand, UnknownConsoleCommand } from "../../define/ConsoleCommand.ts";
