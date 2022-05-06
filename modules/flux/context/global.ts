@@ -2,10 +2,10 @@
 export type GlobalContext = any;
 export type GlobalKey = string | symbol;
 
-export interface GlobalService {
+export interface GlobalService<TService = unknown> {
   globalDeps: GlobalKey[];
   key: string;
-  provider: (globalContext: GlobalContext) => Promise<unknown>;
+  provider: (globalContext: GlobalContext) => Promise<TService>;
 }
 
 export function createGlobalContext(): GlobalContext {

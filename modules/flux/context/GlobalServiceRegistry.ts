@@ -1,8 +1,20 @@
+import { Registry } from "../../common/Registry.ts";
 import { debug } from "../../debugger/debug.ts";
 import { Deferred, deferred } from "../../deps.ts";
 import { GlobalContext, GlobalKey, GlobalService } from "./global.ts";
 
-export class GlobalServiceRegistry {
+
+
+export type GlobalServiceRegistry = Registry<GlobalService>;
+
+export const globalServiceRegistryService: GlobalService<GlobalServiceRegistry> = {
+  globalDeps: [],
+  key: "globalServiceRegistry",
+  provider: async () => new Registry<GlobalService>(),
+};
+
+
+export class GlobalServiceRegistryX {
   readonly #context: GlobalContext;
   readonly #promises = new Map<GlobalKey, Deferred<unknown>>();
   readonly services = new Map<GlobalKey, GlobalService>();

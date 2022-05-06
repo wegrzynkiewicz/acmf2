@@ -1,21 +1,23 @@
-import { GlobalContext } from "../../flux/context/global.ts";
-import { GlobalService } from "../../flux/context/global.ts";
-import { LogConfig } from "../LogConfig.ts";
-import { BasicLogger } from "../loggers/BasicLogger.ts";
-import { Logger, LoggerParameters } from "../loggers/Logger.ts";
-import { nullLogger } from "../loggers/NullLogger.ts";
+import { GlobalContext, GlobalService } from "../flux/context/global.ts";
+import { BasicLogger } from "./BasicLogger.ts";
+import { Logger, LoggerParameters } from "./Logger.ts";
+import { enabledSymbol } from "./logVars.ts";
+import { nullLogger } from "./NullLogger.ts";
 
 export interface LoggerFactory {
   produceLogger(extraParameters: LoggerParameters): Logger;
 }
 
 export async function provideLoggerFactory(
-  { globalContext, logConfig }: {
+  {
+    globalContext,
+    [enabledSymbol]: enabled,
+  }: {
     globalContext: GlobalContext;
-    logConfig: LogConfig;
+    [enabledSymbol]: boolean;
   },
 ): Promise<LoggerFactory> {
-  if (logConfig.enabled === false) {
+  if (enabled === false) {
     const produceLogger = () => nullLogger;
     return { produceLogger };
   }

@@ -26,7 +26,7 @@ export class GlobalServiceResolver {
     return dependencies;
   }
 
-  public resolveService<T>(globalService: GlobalService): Promise<T> {
+  public resolveService<T>(globalService: GlobalService<T>): Promise<T> {
     const { key, globalDeps, provider } = globalService;
 
     (async () => {

@@ -1,6 +1,6 @@
-import { CurrentDateProvider } from "../../date/CurrentDateProvider.ts";
-import { Log } from "../Log.ts";
-import { LogBus } from "../logBus/LogBus.ts";
+import { CurrentDateProvider } from "../date/CurrentDateProvider.ts";
+import { Log } from "./Log.ts";
+import { LogBus } from "./LogBus.ts";
 import { Logger, LoggerInput } from "./Logger.ts";
 
 export class BasicLogger implements Logger {
@@ -82,16 +82,16 @@ export class BasicLogger implements Logger {
     severity: number,
     loggerInput: LoggerInput,
   ): void {
-    const { kind, channel, message, parameters } = loggerInput;
+    const { kind, channel, message, data } = loggerInput;
     const { additionalParameters, logBus } = this;
     const log: Log = {
       channel,
+      data: {
+        ...additionalParameters,
+        ...data,
+      },
       kind,
       message,
-      parameters: {
-        ...additionalParameters,
-        ...parameters,
-      },
       severity,
       time: this.currentDateProvider.provideCurrentDate(),
     };

@@ -1,4 +1,4 @@
-import { Deferred, deferred } from "../deps.ts";
+import { Deferred, deferred } from "../../deps.ts";
 
 export class DeferredMap<TKey = string | symbol, TValue = unknown> {
   #instances = new Map<TKey, TValue>();

@@ -1,9 +1,9 @@
-import { configRegistryService } from "../config/ConfigRegistry.ts";
 import { createGlobalContext } from "./context/global.ts";
-import { GlobalServiceRegistry } from "./context/GlobalServiceRegistry.ts";
+import { globalServiceRegistryService } from "./context/GlobalServiceRegistry.ts";
+import { GlobalServiceResolver } from "./context/GlobalServiceResolver.ts";
+import { environmentVariableRegistryService } from "./env/EnvironmentVariableRegistry.ts";
 import { Particle } from "./particles/Particle.ts";
-import { ParticleManager, particleManagerService } from "./particles/ParticleManager.ts";
-import { ParticleRegistry, particleRegistryService } from "./particles/ParticleRegistry.ts";
+import { particleRegistryService } from "./particles/ParticleRegistry.ts";
 
 export async function bootstrap(
   { particles }: {
@@ -11,21 +11,26 @@ export async function bootstrap(
   },
 ): Promise<void> {
   const globalContext = createGlobalContext();
-  const serviceRegistry = new GlobalServiceRegistry({ context: globalContext });
-  await serviceRegistry.registerService({
-    globalDeps: [],
-    key: "globalServiceRegistry",
-    provider: async () => serviceRegistry,
-  });
-  const particleRegistry = await serviceRegistry.registerService<ParticleRegistry>(particleRegistryService);
-  const particleManager = await serviceRegistry.registerService<ParticleManager>(particleManagerService); 
-  await serviceRegistry.registerService(configRegistryService);
+
+  const globalServiceResolver = new GlobalServiceResolver();
+
+  const [
+    environmentVariableRegistry,
+    globalServiceRegistry,
+    particleRegistry,
+  ] = await Promise.all([
+    globalServiceResolver.resolveService(environmentVariableRegistryService),
+    globalServiceResolver.resolveService(globalServiceRegistryService),
+    globalServiceResolver.resolveService(particleRegistryService),
+  ]);
 
   for (const particle of particles) {
-    await particleRegistry.registerParticle(particle);
+    particleRegistry.register(particle);
+    for (const variable of particle.environmentVariables ?? []) {
+      environmentVariableRegistry.register(variable);
+    }
+    for (const service of particle.globalServices ?? []) {
+      globalServiceRegistry.register(service);
+    }
   }
-  await particleManager.run("initConfigVariables");
-  await particleManager.run("initGlobalServices");
-  await particleManager.run("assignConsoleCommands");
-  await particleManager.run("execute");
 }

@@ -1,21 +1,20 @@
-import { SeverityLogFilter } from "../filters/SeverityLogFilter.ts";
-import { JsonLogFormatter } from "../formatters/JsonLogFormatter.ts";
+import { provideSeverityLogFilter } from "../filters/severityLogFilter.ts";
+import { provideJsonLogFormatter } from "../formatters/jsonLogFormatter.ts";
 import { Log } from "../Log.ts";
-import { LogHandlerConfig } from "../LogConfig.ts";
 import { LogHandler } from "./LogHandler.ts";
 
 export function provideStreamHandler(
-  { config, stream }: {
-    config: LogHandlerConfig;
+  { enabled, minSeverity, stream }: {
+    enabled: boolean;
+    minSeverity: number;
     stream: WritableStream<string>;
   },
 ): LogHandler[] {
-  const { enabled, minSeverity } = config;
   if (enabled === false) {
     return [];
   }
-  const formatter = new JsonLogFormatter();
-  const filter = new SeverityLogFilter({ minSeverity });
+  const formatter = provideJsonLogFormatter();
+  const filter = provideSeverityLogFilter({ minSeverity });
   const handle = (log: Log): void => {
     if (filter.filtrate(log)) {
       const formattedLog = formatter.format(log);

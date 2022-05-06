@@ -4,12 +4,12 @@ export interface LoggerInput {
   channel: string;
   kind: string;
   message: string;
-  parameters?: Record<string, unknown>;
+  data?: LoggerParameters;
 }
 
 export interface Logger {
-  extend: (parameters: Record<string, unknown>) => void;
-  clone: (parameters: Record<string, unknown>) => Logger;
+  extend: (parameters: LoggerParameters) => void;
+  clone: (parameters: LoggerParameters) => Logger;
   emergency: (loggerInput: LoggerInput) => void;
   alert: (loggerInput: LoggerInput) => void;
   critical: (loggerInput: LoggerInput) => void;

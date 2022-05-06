@@ -1,8 +1,8 @@
 export interface Log {
   channel: string;
+  data: Record<string, unknown>;
   kind: string;
   message: string;
-  parameters: Record<string, unknown>;
   severity: number;
   time: Date;
 }

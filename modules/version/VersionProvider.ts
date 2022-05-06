@@ -1,6 +1,5 @@
-import { CurrentDateProvider } from "../date/CurrentDateProvider.ts";
+import { CurrentDateProvider } from "../flux/services/CurrentDateProvider.ts";
 import { GlobalService } from "../flux/context/global.ts";
-import { VersionConfig } from "./VersionConfig.ts";
 
 export interface VersionInfo {
   copyright: string;
@@ -14,14 +13,14 @@ export interface VersionProvider {
 }
 
 export async function provideVersionProvider(
-  { currentDateProvider, versionConfig }: {
+  { currentDateProvider, revision, version }: {
     currentDateProvider: CurrentDateProvider;
-    versionConfig: VersionConfig;
+    revision: string;
+    version: string;
   },
 ): Promise<VersionProvider> {
   const provideVersionInfo = (): VersionInfo => {
     const currentDate = currentDateProvider.provideCurrentDate();
-    const { revision, version } = versionConfig;
     const consoleVersion: VersionInfo = {
       copyright: currentDate.getUTCFullYear().toString(),
       intro: "acmf2",
