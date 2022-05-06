@@ -1,7 +1,7 @@
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
 import { ConsoleCommandExecutor } from "./runtime/ConsoleCommandExecutor.ts";
-import { StreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
+import { createStreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
 import { mainCommand } from "./embedded/mainCommand.ts";
 
 async function execute(
@@ -16,7 +16,7 @@ async function execute(
   },
 ): Promise<number> {
   const { stderr, stdout } = standardStreams;
-  const output = new StreamConsoleOutput({ stderr, stdout });
+  const output = createStreamConsoleOutput({ stderr, stdout });
   const exitCode = await consoleCommandExecutor.executeCommand({
     args: [...startUpArgs],
     currentCommand: mainCommand,

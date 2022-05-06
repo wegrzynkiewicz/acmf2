@@ -1,29 +1,23 @@
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
 
-export class StreamConsoleOutput implements ConsoleOutput {
-  private readonly stderr: WritableStreamDefaultWriter<string>;
-  private readonly stdout: WritableStreamDefaultWriter<string>;
-
-  public constructor(
-    { stderr, stdout }: {
-      stderr: WritableStream<string>;
-      stdout: WritableStream<string>;
+export function createStreamConsoleOutput(
+  { stderr, stdout }: {
+    stderr: WritableStream<string>;
+    stdout: WritableStream<string>;
+  },
+): ConsoleOutput {
+  const stderrWriter = stderr.getWriter();
+  const stdoutWriter = stdout.getWriter();
+  return {
+    error(error: Error): void {
+      const message = error.stack ?? "";
+      stderrWriter.write(`${message}\n`);
     },
-  ) {
-    this.stderr = stderr.getWriter();
-    this.stdout = stdout.getWriter();
-  }
-
-  public error(error: Error): void {
-    const message = error.stack ?? "";
-    this.stderr.write(`${message}\n`);
-  }
-
-  public write(line: string): void {
-    this.stdout.write(line);
-  }
-
-  public writeLine(line: string): void {
-    this.stdout.write(`${line}\n`);
-  }
+    write(line: string): void {
+      stdoutWriter.write(line);
+    },
+    writeLine(line: string): void {
+      stdoutWriter.write(`${line}\n`);
+    },
+  };
 }

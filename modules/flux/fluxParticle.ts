@@ -1,4 +1,4 @@
-import { consoleParticle } from "../console/ConsoleParticle.ts";
+import { consoleParticle } from "../console/consoleParticle.ts";
 import { dateParticle } from "../date/dateParticle.ts";
 import { logParticle } from "../log/logParticle.ts";
 import { startUpArgsService } from "./args/StartUpArgs.ts";
