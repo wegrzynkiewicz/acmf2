@@ -1,4 +1,4 @@
-import { LayoutBooleanConsoleOption } from "../../define/ConsoleOption.ts";
+import { LayoutBooleanConsoleOption } from "../define/option.ts";
 
 export const quietOptionLayout: LayoutBooleanConsoleOption = {
   defaults: false,

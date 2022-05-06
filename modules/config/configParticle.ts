@@ -1,5 +1,5 @@
 import { HelpCommand } from "../console/embedded/help/HelpCommand.ts";
-import { MainCommand } from "../console/embedded/main/MainCommand.ts";
+import { MainCommand } from "../console/embedded/mainCommand.ts";
 import { GlobalServiceRegistry } from "../flux/context/GlobalServiceRegistry.ts";
 import { Particle } from "../flux/particles/Particle.ts";
 import { ConfigCommand, configCommandService } from "./command/ConfigCommand.ts";

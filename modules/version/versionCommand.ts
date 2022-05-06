@@ -1,7 +1,7 @@
 import { ConsoleCommand } from "../console/define/ConsoleCommand.ts";
 import { ConsoleOutput } from "../console/define/ConsoleOutput.ts";
 import { HelpOptions, helpOptionsLayout } from "../console/embedded/help/HelpCommand.ts";
-import { NullArgs, nullArgsLayout } from "../console/embedded/null/NullArgs.ts";
+import { NullArgs, nullArgsLayout } from "../console/embedded/NullArgs.ts";
 import { VersionProvider } from "./VersionProvider.ts";
 
 async function execute(

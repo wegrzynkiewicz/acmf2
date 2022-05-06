@@ -5,9 +5,12 @@ import { GlobalServiceRegistry } from "../context/GlobalServiceRegistry.ts";
 import { EnvironmentVariable } from "../env/EnvironmentVariable.ts";
 import { ParticleRegistry } from "./ParticleRegistry.ts";
 
+export type Executor = (globalContext: GlobalContext) => Promise<number>;
+
 export interface Particle {
   consoleCommands?: ConsoleCommand<unknown, unknown>[];
   environmentVariables?: EnvironmentVariable[];
+  executors?: Executor[];
   globalServices?: GlobalService[];
   key: string;
   particles?: Particle[];

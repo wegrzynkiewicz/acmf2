@@ -3,8 +3,6 @@ import { debug } from "../../debugger/debug.ts";
 import { Deferred, deferred } from "../../deps.ts";
 import { GlobalContext, GlobalKey, GlobalService } from "./global.ts";
 
-
-
 export type GlobalServiceRegistry = Registry<GlobalService>;
 
 export const globalServiceRegistryService: GlobalService<GlobalServiceRegistry> = {
@@ -12,7 +10,6 @@ export const globalServiceRegistryService: GlobalService<GlobalServiceRegistry> 
   key: "globalServiceRegistry",
   provider: async () => new Registry<GlobalService>(),
 };
-
 
 export class GlobalServiceRegistryX {
   readonly #context: GlobalContext;

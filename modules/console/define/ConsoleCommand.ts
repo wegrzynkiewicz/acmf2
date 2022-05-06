@@ -1,22 +1,19 @@
-import { debug } from "../../debugger/debug.ts";
-import { Breaker } from "../../flux/Breaker.ts";
 import { GlobalContext } from "../../flux/context/global.ts";
 import { ScopedContext } from "../../flux/context/scoped.ts";
-import { LayoutConsoleArguments } from "./ConsoleArgument.ts";
-import { LayoutConsoleOptions } from "./ConsoleOption.ts";
+import { LayoutConsoleArguments } from "./argument.ts";
+import { LayoutConsoleOptions } from "./option.ts";
 
 export type UnknownConsoleCommand = ConsoleCommand<unknown, unknown>;
 
 export interface ConsoleCommand<TArgs, TOptions> {
-  aliases?: string[];
   args: LayoutConsoleArguments<TArgs>;
   description?: string;
   execute: (
     globalContext: GlobalContext,
     localContext: ScopedContext,
   ) => Promise<number>;
-  namespaces: string[];
   hidden?: boolean;
+  key: string;
   options: LayoutConsoleOptions<TOptions>;
 }
 

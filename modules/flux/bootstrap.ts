@@ -1,3 +1,4 @@
+import { consoleCommandRegistryService } from "../console/runtime/ConsoleCommandRegistry.ts";
 import { createGlobalContext } from "./context/global.ts";
 import { globalServiceRegistryService } from "./context/GlobalServiceRegistry.ts";
 import { GlobalServiceResolver } from "./context/GlobalServiceResolver.ts";
@@ -11,14 +12,15 @@ export async function bootstrap(
   },
 ): Promise<void> {
   const globalContext = createGlobalContext();
-
   const globalServiceResolver = new GlobalServiceResolver();
 
   const [
+    consoleCommandRegistry,
     environmentVariableRegistry,
     globalServiceRegistry,
     particleRegistry,
   ] = await Promise.all([
+    globalServiceResolver.resolveService(consoleCommandRegistryService),
     globalServiceResolver.resolveService(environmentVariableRegistryService),
     globalServiceResolver.resolveService(globalServiceRegistryService),
     globalServiceResolver.resolveService(particleRegistryService),
@@ -26,6 +28,9 @@ export async function bootstrap(
 
   function processParticle(particle: Particle): void {
     particleRegistry.register(particle);
+    for (const command of particle.consoleCommands ?? []) {
+      consoleCommandRegistry.register(command);
+    }
     for (const service of particle.globalServices ?? []) {
       globalServiceRegistry.register(service);
     }
@@ -39,5 +44,11 @@ export async function bootstrap(
 
   for (const particle of particles) {
     processParticle(particle);
+  }
+
+  for (const particle of particles) {
+    for (const executor of particle.executors ?? []) {
+      executor(globalContext);
+    }
   }
 }

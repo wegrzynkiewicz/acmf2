@@ -1,63 +1,48 @@
-import { LayoutConsoleArguments } from "../define/ConsoleArgument.ts";
+import { LayoutConsoleArguments } from "../define/argument.ts";
+import { SubCommandExecutor } from "../runtime/ConsoleCommandExecutor.ts";
+import { UsagePrinter } from "../runtime/UsagePrinter.ts";
 
 export interface AggregateArgs {
-  args?: string[];
-  command?: string;
+  argsList?: string[];
+  commandName?: string;
 }
 
 export const aggregateArgsLayout: LayoutConsoleArguments<AggregateArgs> = {
   properties: {
-    command: {
+    commandName: {
       description: "The command to execute.",
+      title: "command",
       type: "string",
     },
-    args: {
+    argsList: {
       description: "The arguments to pass to command.",
       items: {
         type: "string",
       },
+      title: "args",
       type: "array",
     },
   },
   required: {
-    command: false,
-    args: false,
+    commandName: false,
+    argsList: false,
   },
   type: "object",
 };
 
 export async function aggregateExecute(
-  { consoleCommandExecutor }: {
-    consoleCommandExecutor: ConsoleCommandExecutor;
-  },
-  { args, executableName, options, output }: {
+  _globalContext: unknown,
+  { args, subCommandExecutor, usagePrinter }: {
     args: AggregateArgs;
-    executableName: string;
-    options: TOptions;
-    output: ConsoleOutput;
+    subCommandExecutor: SubCommandExecutor,
+    usagePrinter: UsagePrinter,
   },
 ): Promise<number> {
-  const { args: argsList, command: commandName } = args;
-
-  if (options && options.help === true) {
-    const usagePrinter = new UsagePrinter({ executableName, output });
-    usagePrinter.writeHelp(this);
-    return 0;
-  }
-
+  const { argsList, commandName } = args;
   if (commandName === undefined || commandName === "") {
-    const usagePrinter = new UsagePrinter({ executableName, output });
-    usagePrinter.writeHelp(this);
+    usagePrinter.printHelp();
     return 0;
   }
-
-  const command = this.getCommandByName(commandName);
-  const exitCode = await consoleCommandExecutor.executeCommand({
-    args: argsList ?? [],
-    command,
-    currentCommand: this,
-    executableName: `${executableName} ${this.name}`,
-    output,
-  });
+  const exitCode = subCommandExecutor.executeSubCommand(commandName, argsList ?? [])
   return exitCode;
 }

@@ -1,3 +1,4 @@
+import { consoleParticle } from "../console/ConsoleParticle.ts";
 import { dateParticle } from "../date/dateParticle.ts";
 import { logParticle } from "../log/logParticle.ts";
 import { startUpArgsService } from "./args/StartUpArgs.ts";
@@ -11,6 +12,7 @@ export const fluxParticle: Particle = {
   ],
   key: "flux",
   particles: [
+    consoleParticle,
     dateParticle,
     logParticle,
   ],

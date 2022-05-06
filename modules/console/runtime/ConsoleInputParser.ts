@@ -125,7 +125,7 @@ export class ConsoleInputParser {
     debug({
       channel: "CONSOLE",
       kind: "console-arguments-parsing",
-      message: `Parsing command (${command.name}) arguments...`,
+      message: `Parsing command (${command.key}) arguments...`,
       parameters: {
         inputArgs: args,
         parsedArgs,

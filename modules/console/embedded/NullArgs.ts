@@ -1,4 +1,4 @@
-import { LayoutConsoleArguments } from "../../define/ConsoleArgument.ts";
+import { LayoutConsoleArguments } from "../define/argument.ts";
 
 export type NullArgs = Record<never, never>;
 

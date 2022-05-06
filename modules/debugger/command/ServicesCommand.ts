@@ -1,4 +1,4 @@
-import { AggregateCommand } from "../../console/embedded/aggregate/AggregateCommand.ts";
+import { AggregateCommand } from "../../console/embedded/AggregateCommand.ts";
 import { HelpOptions, helpOptionsLayout } from "../../console/embedded/help/HelpCommand.ts";
 import { GlobalService } from "../../flux/context/global.ts";
 

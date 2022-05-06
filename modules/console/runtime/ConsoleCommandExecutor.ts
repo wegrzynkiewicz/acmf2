@@ -2,17 +2,18 @@ import { debug } from "../../debugger/debug.ts";
 import { GlobalContext } from "../../flux/context/global.ts";
 import { Breaker } from "../../flux/Breaker.ts";
 import { ConsoleOutput } from "../define/ConsoleOutput.ts";
-import { ConsoleInputParser } from "./ConsoleInputParser.ts";
+import { ConsoleInputParser, ParsedInput } from "./ConsoleInputParser.ts";
 import { UnknownConsoleCommand } from "../define/ConsoleCommand.ts";
 import { GlobalService } from "../../flux/context/global.ts";
-import { UsagePrinter } from "./UsagePrinter.ts";
 import { createScopedContext } from "../../flux/context/scoped.ts";
+import { ConsoleCommandRegistry } from "./ConsoleCommandRegistry.ts";
+import { NullConsoleOutput } from "./NullConsoleOutput.ts";
+import { writeHelp } from "./UsagePrinter.ts";
 
 export interface ConsoleCommandExecutorOptions {
   args: string[];
   command: UnknownConsoleCommand;
   currentCommand: UnknownConsoleCommand;
-  executableName: string;
   output: ConsoleOutput;
 }
 
@@ -20,9 +21,14 @@ export interface ConsoleCommandExecutor {
   executeCommand(options: ConsoleCommandExecutorOptions): Promise<number>;
 }
 
+export interface SubCommandExecutor {
+  executeSubCommand(commandName: string, args: string[]): Promise<number>;
+}
+
 export async function provideConsoleCommandExecutor(
-  { globalContext, consoleInputParser }: {
+  { globalContext, consoleCommandRegistry, consoleInputParser }: {
     globalContext: GlobalContext;
+    consoleCommandRegistry: ConsoleCommandRegistry;
     consoleInputParser: ConsoleInputParser;
   },
 ): Promise<ConsoleCommandExecutor> {
@@ -31,7 +37,6 @@ export async function provideConsoleCommandExecutor(
       args,
       command,
       currentCommand,
-      executableName,
       output,
     }: ConsoleCommandExecutorOptions,
   ): Promise<number> => {
@@ -39,23 +44,15 @@ export async function provideConsoleCommandExecutor(
     debug({
       channel: "CONSOLE",
       kind: "console-command-executing",
-      message: `Executing command (${command.name}) with (${argsString})...`,
+      message: `Executing command (${command.key}) with (${argsString})...`,
     });
-    let options: Record<string, unknown>;
-    let localContext: GlobalContext;
+
+    let parsed: ParsedInput;
     try {
-      const parsed = consoleInputParser.parse({
+      parsed = consoleInputParser.parse({
         args,
         command,
       });
-      options = parsed.options;
-      localContext = createScopedContext();
-      localContext["args"] = parsed.args;
-      localContext["command"] = command;
-      localContext["executableName"] = executableName;
-      localContext["options"] = parsed.options;
-      localContext["output"] = output;
-      localContext["previousCommand"] = currentCommand;
     } catch (error: unknown) {
       if (error instanceof Error) {
         output.writeLine(error.message);
@@ -63,11 +60,51 @@ export async function provideConsoleCommandExecutor(
       return 1;
     }
 
-    if (options.help === true) {
-      const usagePrinter = new UsagePrinter({ executableName, output });
-      usagePrinter.writeHelp(command);
+    if (command.options.properties.quiet && parsed.options.quiet === true) {
+      output = new NullConsoleOutput();
+    }
+
+    const { entries } = consoleCommandRegistry;
+    const childrenCommands = [...entries.keys()]
+      .filter((k) => k.toString().startsWith(`${command.key}:`))
+      .map((k) => entries.get(k)!);
+
+    const printHelp = (): void => {
+      writeHelp({ childrenCommands, command, output });
+    };
+
+    const executeSubCommand = async (commandName: string, args: string[]): Promise<number> => {
+      const commandKey = `${currentCommand.key}:${commandName}`;
+      const command = childrenCommands.find((e) => e.key === commandKey);
+      if (command === undefined) {
+        throw new Breaker({
+          kind: "console-command-missing",
+          message: `Console command with key (${commandKey}) not exists.`,
+          status: 1,
+        });
+      }
+      const exitCode = await executeCommand({
+        args,
+        command,
+        currentCommand,
+        output,
+      });
+      return exitCode;
+    };
+
+    if (command.options.properties.help && parsed.options.help === true) {
+      printHelp();
       return 0;
     }
+
+    const localContext = createScopedContext();
+    localContext["args"] = parsed.args;
+    localContext["currentCommand"] = command;
+    localContext["subCommandExecutor"] = {executeSubCommand};
+    localContext["options"] = parsed.options;
+    localContext["output"] = output;
+    localContext["previousCommand"] = currentCommand;
+    localContext["printHelp"] = printHelp;
 
     try {
       const result = await command.execute(globalContext, localContext);
@@ -95,7 +132,7 @@ export async function provideConsoleCommandExecutor(
 }
 
 export const consoleCommandExecutorService: GlobalService = {
-  globalDeps: ["globalContext", "consoleInputParser"],
+  globalDeps: ["globalContext", "consoleCommandRegistry", "consoleInputParser"],
   key: "consoleCommandExecutor",
   provider: provideConsoleCommandExecutor,
 };
