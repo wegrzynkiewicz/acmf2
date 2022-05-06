@@ -7,9 +7,10 @@ import { ParticleRegistry } from "./ParticleRegistry.ts";
 
 export interface Particle {
   consoleCommands?: ConsoleCommand<unknown, unknown>[];
-  environmentVariables?: EnvironmentVariable[],
+  environmentVariables?: EnvironmentVariable[];
   globalServices?: GlobalService[];
   key: string;
+  particles?: Particle[];
 }
 
 export interface Particle {

@@ -10,6 +10,8 @@ export const severityLabels: string[] = [
   "SILLY",
 ];
 
+export const severityMap = Object.fromEntries(severityLabels.map((e, i) => [e, i]));
+
 export function convertSeverityCodeToLabel(code: number): string {
   const value = severityLabels[code];
   if (value === undefined) {
@@ -19,26 +21,9 @@ export function convertSeverityCodeToLabel(code: number): string {
 }
 
 export function convertSeverityLabelToCode(label: string): number {
-  switch (label.toUpperCase()) {
-    case "ALERT":
-      return 1;
-    case "CRITICAL":
-      return 2;
-    case "DEBUG":
-      return 7;
-    case "EMERGENCY":
-      return 0;
-    case "ERROR":
-      return 3;
-    case "INFO":
-      return 6;
-    case "NOTICE":
-      return 5;
-    case "SILLY":
-      return 8;
-    case "WARNING":
-      return 4;
-    default:
-      throw new Error("Unexpected log label.");
+  const code = severityMap[label];
+  if (code === undefined) {
+    throw new Error("Unexpected log label.");
   }
+  return code;
 }

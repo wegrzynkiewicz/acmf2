@@ -24,13 +24,20 @@ export async function bootstrap(
     globalServiceResolver.resolveService(particleRegistryService),
   ]);
 
-  for (const particle of particles) {
+  function processParticle(particle: Particle): void {
     particleRegistry.register(particle);
-    for (const variable of particle.environmentVariables ?? []) {
-      environmentVariableRegistry.register(variable);
-    }
     for (const service of particle.globalServices ?? []) {
       globalServiceRegistry.register(service);
     }
+    for (const variable of particle.environmentVariables ?? []) {
+      environmentVariableRegistry.register(variable);
+    }
+    for (const childParticle of particle.particles ?? []) {
+      processParticle(childParticle);
+    }
+  }
+
+  for (const particle of particles) {
+    processParticle(particle);
   }
 }
