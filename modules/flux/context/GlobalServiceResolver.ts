@@ -37,10 +37,15 @@ export class GlobalServiceResolver {
     const services = [...globalServiceRegistry.entities.values()];
     const promises = services.map((service) => this.resolveService(service));
     const whenTimeoutError = new Error();
+    const abortController = new AbortController();
     try {
       await Promise.race([
         Promise.all(promises),
-        timeout(2000, whenTimeoutError),
+        timeout({
+          milliseconds: 2000,
+          reason: whenTimeoutError,
+          signal: abortController.signal,
+        }),
       ]);
     } catch (error: unknown) {
       if (error === whenTimeoutError) {
@@ -48,6 +53,8 @@ export class GlobalServiceResolver {
         throw new Error(`Not all services were resolved on time (${keys})`, { cause: whenTimeoutError });
       }
       throw error;
+    } finally {
+      abortController.abort();
     }
     const entries = collect(this.#instances.entries());
     return entries;

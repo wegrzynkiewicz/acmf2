@@ -1,8 +1,9 @@
 import { Particle } from "../flux/particles/Particle.ts";
 import { StandardStreams } from "../flux/streams/StandardStreams.ts";
-import { ConsoleCommandExecutor } from "./runtime/ConsoleCommandExecutor.ts";
+import { ConsoleCommandExecutor, consoleCommandExecutorService } from "./runtime/ConsoleCommandExecutor.ts";
 import { createStreamConsoleOutput } from "./runtime/StreamConsoleOutput.ts";
 import { mainCommand } from "./embedded/mainCommand.ts";
+import { consoleInputParserService } from "./runtime/ConsoleInputParser.ts";
 
 async function execute(
   {
@@ -32,6 +33,10 @@ export const consoleParticle: Particle = {
   ],
   executors: [
     execute,
+  ],
+  globalServices: [
+    consoleCommandExecutorService,
+    consoleInputParserService,
   ],
   key: "console",
 };

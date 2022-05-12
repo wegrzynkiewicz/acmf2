@@ -104,7 +104,7 @@ export async function provideConsoleCommandExecutor(
     localContext["options"] = parsed.options;
     localContext["output"] = output;
     localContext["previousCommand"] = currentCommand;
-    localContext["printHelp"] = printHelp;
+    localContext["usagePrinter"] = {printHelp};
 
     try {
       const result = await command.execute(globalContext, localContext);

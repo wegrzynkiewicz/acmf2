@@ -1,4 +1,4 @@
-import { Deferred, deferred } from "../deps.ts";
+import { Deferred, deferred } from "../../deps.ts";
 
 export class PromiseCollector {
   private readonly promises = new Set<Promise<unknown>>();

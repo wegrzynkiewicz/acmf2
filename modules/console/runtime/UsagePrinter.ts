@@ -97,7 +97,7 @@ export function getCommandArgumentLabel(
 ): string {
   const rest = layout.type === "array";
   const defaults = isPrimitiveLayout(layout) ? layout.defaults : undefined;
-  let label = name;
+  let label = layout.title ?? name;
   if (rest) {
     label += "...";
   }
