@@ -35,12 +35,15 @@ export class GlobalServiceResolver {
   ): Promise<Record<GlobalKey, unknown>> {
     const services = [...globalServiceRegistry.entities.values()];
     const promises = services.map((service) => this.resolveService(service));
+    const whenTimeoutError = new Error();
     try {
-      await Promise.all([...promises, timeout(200)]);
+      await Promise.all([...promises, timeout(200, whenTimeoutError)]);
     } catch (error: unknown) {
-      for (const key of this.#instances.unresolvedKeys()) {
-        console.log(key);
+      if (error === whenTimeoutError) {
+        const keys = [...this.#instances.unresolvedKeys()].map((k) => k.toString()).join(", ");
+        throw new Error(`Not all services were resolved on time (${keys})`, { cause: whenTimeoutError });
       }
+      throw error;
     }
     const instances = await collect(this.#instances.entries());
     const record = Object.fromEntries(instances);
