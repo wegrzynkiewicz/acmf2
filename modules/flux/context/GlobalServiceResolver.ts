@@ -23,6 +23,7 @@ export class GlobalServiceResolver {
     (async () => {
       const dependencies = await this.resolveDependentServices(globalDeps);
       const service = await provider(dependencies);
+      // TODO: Add logs
       this.#instances.set(key, service);
     })();
 
@@ -32,12 +33,15 @@ export class GlobalServiceResolver {
 
   public async resolveRegisteredServices(
     globalServiceRegistry: GlobalServiceRegistry,
-  ): Promise<Record<GlobalKey, unknown>> {
+  ): Promise<[GlobalKey, unknown][]> {
     const services = [...globalServiceRegistry.entities.values()];
     const promises = services.map((service) => this.resolveService(service));
     const whenTimeoutError = new Error();
     try {
-      await Promise.all([...promises, timeout(200, whenTimeoutError)]);
+      await Promise.race([
+        Promise.all(promises),
+        timeout(2000, whenTimeoutError),
+      ]);
     } catch (error: unknown) {
       if (error === whenTimeoutError) {
         const keys = [...this.#instances.unresolvedKeys()].map((k) => k.toString()).join(", ");
@@ -45,8 +49,7 @@ export class GlobalServiceResolver {
       }
       throw error;
     }
-    const instances = await collect(this.#instances.entries());
-    const record = Object.fromEntries(instances);
-    return record;
+    const entries = collect(this.#instances.entries());
+    return entries;
   }
 }

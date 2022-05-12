@@ -48,6 +48,9 @@ export async function bootstrap(
   }
 
   const services = await globalServiceResolver.resolveRegisteredServices(globalServiceRegistry);
+  for (const [key, service] of services) {
+    globalContext[key] = service;
+  }
 
   for (const particle of particles) {
     for (const executor of particle.executors ?? []) {

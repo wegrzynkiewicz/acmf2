@@ -43,7 +43,7 @@ export async function provideLogBus(
 }
 
 export const logBusService: GlobalService = {
-  globalDeps: ["logConfig", "standardStreams"],
+  globalDeps: ["standardStreams"],
   key: "logBus",
   provider: provideLogBus,
 };

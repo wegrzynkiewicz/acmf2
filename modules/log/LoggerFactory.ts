@@ -35,7 +35,7 @@ export async function provideLoggerFactory(
 }
 
 export const loggerFactoryService: GlobalService = {
-  globalDeps: ["globalContext", "logConfig"],
+  globalDeps: ["globalContext"],
   key: "loggerFactory",
   provider: provideLoggerFactory,
 };

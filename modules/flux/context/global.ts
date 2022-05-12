@@ -17,7 +17,7 @@ export function createGlobalContext(): GlobalContext {
   return context;
 }
 
-export const globalContextService: GlobalService = {
+export const globalContextService: GlobalService<GlobalContext> = {
   globalDeps: [],
   key: "globalContext",
   provider: createGlobalContext,
