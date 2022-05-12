@@ -64,10 +64,10 @@ export async function provideConsoleCommandExecutor(
       output = new NullConsoleOutput();
     }
 
-    const { entries } = consoleCommandRegistry;
-    const childrenCommands = [...entries.keys()]
+    const { entities } = consoleCommandRegistry;
+    const childrenCommands = [...entities.keys()]
       .filter((k) => k.toString().startsWith(`${command.key}:`))
-      .map((k) => entries.get(k)!);
+      .map((k) => entities.get(k)!);
 
     const printHelp = (): void => {
       writeHelp({ childrenCommands, command, output });

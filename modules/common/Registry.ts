@@ -3,13 +3,13 @@ export interface Entry {
 }
 
 export class Registry<TEntry extends Entry> {
-  public readonly entries = new Map<string | symbol, TEntry>();
+  public readonly entities = new Map<string | symbol, TEntry>();
 
   public register(variable: TEntry): void {
     const { key } = variable;
-    if (this.entries.has(key)) {
+    if (this.entities.has(key)) {
       throw new Error(`Entry with key (${key.toString()}) already exists.`);
     }
-    this.entries.set(key, variable);
+    this.entities.set(key, variable);
   }
 }

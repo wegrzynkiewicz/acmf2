@@ -26,16 +26,12 @@ async function execute(
   return exitCode;
 }
 
-export const consoleExecutorParticle: Particle = {
-  executors: [
-    execute,
-  ],
-  key: "console-executor",
-};
-
 export const consoleParticle: Particle = {
   consoleCommands: [
     mainCommand,
+  ],
+  executors: [
+    execute,
   ],
   key: "console",
 };

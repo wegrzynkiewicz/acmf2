@@ -1,4 +1,4 @@
-import { sleep } from "./sleep.ts";
+import { delay } from "./async/delay.ts";
 
 /**
  * Create a function that will call the callback the indicated number of tries
@@ -34,7 +34,7 @@ export class Repeater<T> {
         if (this.tries === 0) {
           throw error;
         }
-        await sleep(this.interval);
+        await delay(this.interval);
       }
     }
   }

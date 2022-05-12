@@ -16,3 +16,9 @@ export function createGlobalContext(): GlobalContext {
   };
   return context;
 }
+
+export const globalContextService: GlobalService = {
+  globalDeps: [],
+  key: "globalContext",
+  provider: createGlobalContext,
+};

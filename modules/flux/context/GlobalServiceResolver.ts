@@ -1,20 +1,11 @@
+import { collect } from "../../common/async/collect.ts";
 import { DeferredMap } from "../../common/async/DeferredMap.ts";
+import { timeout } from "../../common/async/timeout.ts";
 import { GlobalKey, GlobalService } from "./global.ts";
+import { GlobalServiceRegistry } from "./GlobalServiceRegistry.ts";
 
 export class GlobalServiceResolver {
-  // readonly #globalContext: GlobalContext;
   readonly #instances = new DeferredMap<GlobalKey, unknown>();
-  // readonly #globalServiceRegistry: GlobalServiceRegistry;
-
-  // public constructor(
-  //   { globalContext, globalServiceRegistry }: {
-  //     globalContext: GlobalContext;
-  //     globalServiceRegistry: GlobalContext;
-  //   },
-  // ) {
-  //   this.#globalServiceRegistry = globalServiceRegistry;
-  //   this.#globalContext = globalContext;
-  // }
 
   public async resolveDependentServices(globalDeps: GlobalKey[]): Promise<Record<GlobalKey, unknown>> {
     const promises = globalDeps.map(async (key: GlobalKey): Promise<[GlobalKey, unknown]> => {
@@ -37,5 +28,22 @@ export class GlobalServiceResolver {
 
     const promise = this.#instances.get(key);
     return promise as Promise<T>;
+  }
+
+  public async resolveRegisteredServices(
+    globalServiceRegistry: GlobalServiceRegistry,
+  ): Promise<Record<GlobalKey, unknown>> {
+    const services = [...globalServiceRegistry.entities.values()];
+    const promises = services.map((service) => this.resolveService(service));
+    try {
+      await Promise.all([...promises, timeout(200)]);
+    } catch (error: unknown) {
+      for (const key of this.#instances.unresolvedKeys()) {
+        console.log(key);
+      }
+    }
+    const instances = await collect(this.#instances.entries());
+    const record = Object.fromEntries(instances);
+    return record;
   }
 }
