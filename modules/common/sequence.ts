@@ -1,4 +1,4 @@
-import { Deferred, deferred } from "../../deps.ts";
+import { Deferred, deferred } from "../deps.ts";
 
 export function sequence<T>(promises: IterableIterator<Promise<T>> | Promise<T>[]): AsyncIterable<T> {
   const resolvedValues = [];

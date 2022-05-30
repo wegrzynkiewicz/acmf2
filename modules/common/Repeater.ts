@@ -1,4 +1,4 @@
-import { delay } from "./async/delay.ts";
+import { delay } from "./delay.ts";
 
 /**
  * Create a function that will call the callback the indicated number of tries
